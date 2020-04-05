@@ -127,3 +127,12 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+#Custom
+mst-dataset/
+.vscode/
+jupyterhub-proxy.pid
+jupyterhub.sqlite
+jupyterhub_config.py
+jupyterhub_cookie_secret
+passwords.dbm
