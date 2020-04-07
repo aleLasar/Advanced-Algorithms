@@ -350,7 +350,7 @@ def prim(graph, s):
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
             v = edge.node()
-            if( not v.present() and edge.weight() < v.key()):
+            if( v.present() and edge.weight() < v.key()):
                 v.set_parent(u)
                 v.set_key(edge.weight())
                 heap_keys._orderup(v._position)
@@ -376,11 +376,14 @@ def read_file(filename):
 if __name__ == "__main__":
     with os.scandir('mst-dataset') as it:
         for i,entry in enumerate(it):
-            if i < 67:
+            if i < 1:
                 continue
             if not entry.name.startswith('.') and entry.is_file():
                 graph = read_file("mst-dataset/"+entry.name)
                 prim(graph, 0)
-                if i == 68:
+                if i == 2:
                     break
 
+
+
+# %%
