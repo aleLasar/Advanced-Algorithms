@@ -138,73 +138,6 @@ class Heap():
 
 
 # %%
-class TreeNode():
-    def __init__(self, left, right, key):
-        self._key = key
-        self._left = left
-        self._right = right
-    def left(self):
-        return self._left
-    def right(self):
-        return self._right
-    def key(self):
-        return self._key
-    def set_key(self, key):
-        self._key = key
-    def set_left(self,left):
-        self._left = left
-    def set_right(self,right):
-        self._right = right
-
-class Tree():
-
-    def __init__(self):
-        self._root = None
-
-    def add(self,root,node):
-        if not self._root:
-            self._root = node
-        else:
-            if root is None:
-                root = node
-            elif root.key() >= node.key():
-                if root.left() is None:
-                    root.set_left(node)
-                else:
-                    self.add(root.left(),node)
-            else:
-                if root.right() is None:
-                    root.set_right(node)
-                else:
-                    self.add(root.right(),node)
-    
-    def search(self,root,node):
-        if root is None:
-            return False
-        if root.key()==node.key():
-            return True
-        if root.key() > node.key():
-            return self.search(root.left(),node)
-        return self.search(root.right(),node)
-
-    def root(self):
-        return self._root
-
-    def prefix(self,root):
-        if root:
-            toreturn = ""
-            if root.left():
-                toreturn += self.prefix(root.left())
-            toreturn += " " + str(root.key()) + " "
-            if root.right():
-                toreturn += self.prefix(root.right())
-            return toreturn
-
-    def __str__(self):
-        return str(self.prefix(self._root))
-
-
-# %%
 class Node():
     
     def __init__(self,name):
@@ -409,12 +342,10 @@ def prim(graph, s):
     adjacency_list = graph.get_graph()
     adjacency_list[s].set_key(0)
     heap_keys = Heap()
-    tree_nodes = Tree()
     for node in adjacency_list:
         heap_keys.push(node)
     while len(heap_keys) !=0:
         u = heap_keys.pop()
-        tree_nodes.add(tree_nodes.root(),TreeNode(None,None,u.name()))
         print("Node: "+str(u.name()+1))
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
