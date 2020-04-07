@@ -270,18 +270,15 @@ class Edge():
 class Graph():
 
     def __init__(self,n):
-        self._nodes = []
-        self._node_names = []
-        for i in range(n):
-            self._nodes.append(None)
+        self._nodes = [None] * n
 
-    def add_node(self, node):
-        if not self.is_node_present(node):
-            self._nodes[node.name()] = node
-            self._node_names.append(node.name())
+    def add_node(self, name):
+        if not self.is_node_present(name):
+            node = Node(name)
+            self._nodes[name] = node
             return node
         else:
-            return self._nodes[node.name()]
+            return self._nodes[name]
 
     def add_edge(self, src, dest, weight):
         edge = Edge(dest,weight)
@@ -292,10 +289,10 @@ class Graph():
     def get_graph(self):
         return self._nodes
 
-    def is_node_present(self,node):
-        if node.name() in self._node_names:
-            return True
-        return False
+    def is_node_present(self,name):
+        if self._nodes[name] is None:
+            return False
+        return True
 
 # %% [markdown]
 # # Algoritmo di Prim
@@ -339,6 +336,7 @@ import os
 import sys
 
 def prim(graph, s):
+    mst_weight = 0
     adjacency_list = graph.get_graph()
     adjacency_list[s].set_key(0)
     heap_keys = Heap()
@@ -357,6 +355,8 @@ def prim(graph, s):
         if u.parent():
             print("  parent: "+str(u.parent().name()+1))
         print("  key: "+str(u.key()))
+        mst_weight += u.key()
+    print(mst_weight)    
 
 def read_file(filename):
     file = open(filename, "r")
@@ -365,10 +365,8 @@ def read_file(filename):
     for line in file:
         tripla = list(map(int, line.split()))
         if tripla[0] != tripla[1]:
-            src = Node(tripla[0]-1)
-            dest = Node(tripla[1]-1)
-            src = graph.add_node(src)
-            dest = graph.add_node(dest)
+            src = graph.add_node(tripla[0]-1)
+            dest = graph.add_node(tripla[1]-1)
             graph.add_edge(src, dest, tripla[2])
     file.close()
     return graph
@@ -376,14 +374,14 @@ def read_file(filename):
 if __name__ == "__main__":
     with os.scandir('mst-dataset') as it:
         for i,entry in enumerate(it):
-            if i < 1:
+            print(i)
+            if i < 67:
                 continue
             if not entry.name.startswith('.') and entry.is_file():
                 graph = read_file("mst-dataset/"+entry.name)
                 prim(graph, 0)
-                if i == 2:
+                if i == 67:
                     break
-
 
 
 # %%
