@@ -68,10 +68,11 @@ class Heap():
 
         min_value = self._list[0]
         self._list[0], self._list[self._ultimo] = self._list[self._ultimo], self._list[0]
-        self._list[0]._position, self._list[self._ultimo]._position =            self._list[self._ultimo]._position, self._list[0]._position 
+        self._list[0]._position, self._list[self._ultimo]._position =\
+            self._list[self._ultimo]._position, self._list[0]._position 
         self._ultimo -= 1
         self._orderdown(0)
-
+        min_value.set_present(False)
         return min_value
 
     def _orderup(self, index):
@@ -80,7 +81,8 @@ class Heap():
             if p_value <= self._list[index]:
                 break
             self._list[p_index], self._list[index] = self._list[index], self._list[p_index]
-            self._list[p_index]._position, self._list[index]._position =                self._list[index]._position, self._list[p_index]._position
+            self._list[p_index]._position, self._list[index]._position =\
+                self._list[index]._position, self._list[p_index]._position
             index = p_index
 
     def _orderdown(self, index):
@@ -102,7 +104,8 @@ class Heap():
             else:
                 break
             self._list[new_index], self._list[index] = self._list[index], self._list[new_index]
-            self._list[new_index]._position, self._list[index]._position =                self._list[index]._position, self._list[new_index]._position
+            self._list[new_index]._position, self._list[index]._position =\
+                self._list[index]._position, self._list[new_index]._position
             index = new_index
 
     def _get_parent(self, index: int):
@@ -199,33 +202,6 @@ class Tree():
 
     def __str__(self):
         return str(self.prefix(self._root))
-            
-
-
-# %%
-class UnionFind():
-
-    def __init__(self):
-        self._parents = []
-    
-    def initialize(self, n: int):
-        for i in range(0,n):
-            self._parents[i] = i
-
-    def find(self, x, depth=0):
-        if (x != self._parents[x]):
-            return self.find(self._parents[x], depth+1)
-        return x, depth
-
-    def union(self, x, y):
-        set_x, depth_x = find(x)
-        set_y, depth_y = find(y)
-        if(set_x == set_y):
-            return
-        if(depth_x > depth_y):
-            self._parents[set_y] = set_x
-        else:
-            self._parents[set_x] = set_y
 
 
 # %%
@@ -236,6 +212,7 @@ class Node():
         self._key = sys.maxsize
         self._parent = None
         self._position = None
+        self._present = True
         self._edges = []
 
     def __gt__(self, other): 
@@ -301,6 +278,12 @@ class Node():
     def position(self):
         return self._position
 
+    def present(self):
+        return self._present
+
+    def set_present(self,present):
+        self._present = present
+            
 class Edge():
 
     def __init__(self, node, weight):
@@ -374,50 +357,12 @@ class Graph():
         self._nodes[dest.name()].add_edge(edge2)
 
     def get_graph(self):
-        """for (i,node) in enumerate(self._nodes):
-            print("Node: "+str(node.name()+1))
-            for edge in node.edges():
-                print("Dest: "+str(edge.node().name()+1)+" Weight: "+str(edge.weight())+" | ")"""
         return self._nodes
 
     def is_node_present(self,node):
         if node.name() in self._node_names:
             return True
         return False
-
-    #implemented with mergeSort
-    #def get_ordered_inc_nodes(self)
-        
-
-    """def __mergeSort(self, array: list[Node]):
-        if len(array) >1: 
-            mid = len(array)//2
-            L = arr[:mid] 
-            R = arr[mid:] 
-    
-            __mergeSort(L) 
-            __mergeSort(R)  
-    
-            i = j = k = 0
-            
-            while i < len(L) and j < len(R): 
-                if L[i] < R[j]: 
-                    array[k] = L[i] 
-                    i+=1
-                else: 
-                    array[k] = R[j] 
-                    j+=1
-                k+=1
-     
-            while i < len(L): 
-                array[k] = L[i] 
-                i+=1
-                k+=1
-            
-            while j < len(R): 
-                array[k] = R[j] 
-                j+=1
-                k+=1      """      
 
 # %% [markdown]
 # # Algoritmo di Prim
@@ -474,7 +419,7 @@ def prim(graph, s):
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
             v = edge.node()
-            if( not tree_nodes.search(tree_nodes.root(),TreeNode(None,None,v.name())) and edge.weight() < v.key()):
+            if( not v.present() and edge.weight() < v.key()):
                 v.set_parent(u)
                 v.set_key(edge.weight())
                 heap_keys._orderup(v._position)
