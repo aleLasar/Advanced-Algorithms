@@ -344,7 +344,7 @@ def prim(graph, s):
         heap_keys.push(node)
     while len(heap_keys) !=0:
         u = heap_keys.pop()
-        print("Node: "+str(u.name()+1))
+        #print("Node: "+str(u.name()+1))
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
             v = edge.node()
@@ -352,11 +352,11 @@ def prim(graph, s):
                 v.set_parent(u)
                 v.set_key(edge.weight())
                 heap_keys._orderup(v._position)
-        if u.parent():
+        """if u.parent():
             print("  parent: "+str(u.parent().name()+1))
-        print("  key: "+str(u.key()))
+        print("  key: "+str(u.key()))"""
         mst_weight += u.key()
-    print(mst_weight)    
+    return mst_weight    
 
 def read_file(filename):
     file = open(filename, "r")
@@ -372,16 +372,18 @@ def read_file(filename):
     return graph
 
 if __name__ == "__main__":
-    with os.scandir('mst-dataset') as it:
+    with os.scandir('test-case') as it:
         for i,entry in enumerate(it):
-            print(i)
-            if i < 67:
-                continue
-            if not entry.name.startswith('.') and entry.is_file():
-                graph = read_file("mst-dataset/"+entry.name)
-                prim(graph, 0)
-                if i == 67:
-                    break
-
+            if "input_random" in entry.name:
+                graph = read_file("test-case/"+entry.name)
+                weight = prim(graph, 0)
+                test = entry.name.replace("input_random","output_random")
+                with open("test-case/"+test) as f:
+                    result = int(f.read().split()[0])
+                    if result != weight:
+                        print("Our result: "+str(weight))
+                        print("Correct: "+str(result))
+                        print("Graph: "+str(entry.name))
+                        break
 
 # %%
