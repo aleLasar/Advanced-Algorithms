@@ -370,20 +370,22 @@ def read_file(filename):
             graph.add_edge(src, dest, tripla[2])
     file.close()
     return graph
-
-if __name__ == "__main__":
-    with os.scandir('test-case') as it:
+    
+def main(folder):
+    with os.scandir(folder) as it:
         for i,entry in enumerate(it):
             if "input_random" in entry.name:
-                graph = read_file("test-case/"+entry.name)
+                graph = read_file(folder+"/"+entry.name)
                 weight = prim(graph, 0)
                 test = entry.name.replace("input_random","output_random")
-                with open("test-case/"+test) as f:
+                with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
-                    if result != weight:
-                        print("Our result: "+str(weight))
-                        print("Correct: "+str(result))
-                        print("Graph: "+str(entry.name))
-                        break
+                    print("Our result: "+str(weight))
+                    print("Correct: "+str(result))
+                    print("Graph: "+str(entry.name))
+
+if __name__ == "__main__":
+    main("mst-dataset")
+    
 
 # %%

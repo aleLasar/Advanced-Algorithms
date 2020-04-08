@@ -129,7 +129,6 @@ dmypy.json
 .pyre/
 
 #Custom
-mst-dataset/
 .vscode/
 jupyterhub-proxy.pid
 jupyterhub.sqlite
