@@ -293,6 +293,28 @@ class Graph():
         if self._nodes[name] is None:
             return False
         return True
+    
+    def isCyclic(self): 
+        visited =[False]*(len(self._nodes)) 
+        for i in range(len(self._nodes)): 
+            if visited[i] ==False:
+                if(self._isCyclicUtil(i,visited,-1))== True: 
+                    return True
+          
+        return False
+    
+    def _isCyclicUtil(self,v:int,visited,parent): 
+        visited[v]= True
+        vicini = self._nodes[v]._edges
+        for i in vicini: #i = Edge
+            if  visited[i._node._name]==False :  
+                if(self._isCyclicUtil(i._node._name,visited,v)): 
+                    return True
+            #non considero loop i self-loop tra due nodi (anche con diversi archi)
+            elif  parent!=i._node._name:    
+                return True
+          
+        return False
 
 # %% [markdown]
 # # Algoritmo di Prim
@@ -335,28 +357,7 @@ class Graph():
 import os
 import sys
 
-def prim(graph, s):
-    mst_weight = 0
-    adjacency_list = graph.get_graph()
-    adjacency_list[s].set_key(0)
-    heap_keys = Heap()
-    for node in adjacency_list:
-        heap_keys.push(node)
-    while len(heap_keys) !=0:
-        u = heap_keys.pop()
-        print("Node: "+str(u.name()+1))
-        adjacents = adjacency_list[u.name()].edges()
-        for edge in adjacents:
-            v = edge.node()
-            if( v.present() and edge.weight() < v.key()):
-                v.set_parent(u)
-                v.set_key(edge.weight())
-                heap_keys._orderup(v._position)
-        if u.parent():
-            print("  parent: "+str(u.parent().name()+1))
-        print("  key: "+str(u.key()))
-        mst_weight += u.key()
-    print(mst_weight)    
+def kruskal_naive(graph):
 
 def read_file(filename):
     file = open(filename, "r")
@@ -372,16 +373,8 @@ def read_file(filename):
     return graph
 
 if __name__ == "__main__":
-    with os.scandir('mst-dataset') as it:
-        for i,entry in enumerate(it):
-            print(i)
-            if i < 67:
-                continue
-            if not entry.name.startswith('.') and entry.is_file():
-                graph = read_file("mst-dataset/"+entry.name)
-                prim(graph, 0)
-                if i == 67:
-                    break
-
+    graph = read_file('mst-dataset/input_random_01_10.txt')
+    p=graph.isCyclic()
+    print(p)
 
 # %%
