@@ -335,12 +335,6 @@ def read_file(filename):
     file.close()
     return graph
 
-<<<<<<< HEAD
-if __name__ == "__main__":
-    graph = read_file('mst-dataset/input_random_01_10.txt')
-    p=graph.isCyclic()
-    print(p)
-=======
 def main(folder):
     with os.scandir(folder) as it:
         for i,entry in enumerate(it):
@@ -358,6 +352,5 @@ def main(folder):
 if __name__ == "__main__":
     main("mst-dataset")
 
->>>>>>> 5c006497aac0dce3f7cc9ef3909fca70163f2378
 
 # %%
