@@ -55,6 +55,8 @@ class Node():
     
     def __init__(self,name):
         self._name = name
+        self._visited = False
+        self._edges = []
 
     def __gt__(self, other): 
         if(self._name > other._name): 
@@ -97,12 +99,25 @@ class Node():
 
     def set_name(self,name):
         self._name = name
+        
+    def visited(self):
+        return self._visited
+
+    def set_visited(self, visited):
+        self._visited = visited   
+
+    def edges(self):
+        return self._edges
+    
+    def add_edge(self, edge):
+        self._edges.append(edge)         
             
 class Edge():
 
     def __init__(self, src, dest, weight):
         self._nodes = src, dest
         self._weight = weight
+        self._label = None
 
     def __gt__(self, other): 
         if(self._weight > other._weight): 
@@ -148,19 +163,53 @@ class Edge():
 
     def nodes(self):
         return self._nodes
+        
+    def label(self):
+        return self._label
+
+    def set_label(self, label):
+        self._label = label   
+
+    def opposite(self, node):
+        if node == self._nodes[0]:
+            return self._nodes[1]
+        if node == self._nodes[1]:
+            return self._nodes[0]
+        return None                
 
 
 # %%
 class Graph():
 
-    def __init__(self):
+    def __init__(self, n):
+        self._nodes = [None] * n
         self._edges = []
 
-    def add_edge(self, src, dest, weight):
-        self._edges.append(Edge(src, dest, weight))
+    def add_node(self, name):
+        if not self.is_node_present(name):
+            node = Node(name)
+            self._nodes[name] = node
+            return node
+        else:
+            return self._nodes[name]
 
-    def get_graph(self):
+    def add_edge(self, src, dest, weight):
+        edge = Edge(src, dest, weight)
+        self._edges.append(edge)
+        self._nodes[src.name()].add_edge(edge)
+        edge2 = Edge(dest, src, weight)
+        self._nodes[dest.name()].add_edge(edge2)
+
+    def get_edges(self):
         return self._edges
+        
+    def get_nodes(self):
+        return self._nodes    
+        
+    def is_node_present(self,name):
+        if self._nodes[name] is None:
+            return False
+        return True   
         
     def _merge(self, left, middle, right): 
         dim_left = middle - left + 1
@@ -230,19 +279,38 @@ class Graph():
 import os
 import sys
 
+def dfs(graph, s):
+    s.set_visited(True)
+    for edge in graph.get_nodes()[s.name()].edges():
+        if not edge.label():
+            w = edge.opposite(s)
+            if w and not w.visited():
+                edge.set_label(1)
+                dfs(graph,w)
+            else:
+                edge.set_label(2)
+
+
 def kruskal(graph, s):
-    mst = graph()
+    mst_weight = 0
     graph.ordinaLati()
-    
+    adjacency_list = graph.get_nodes()
+    dfs(graph,adjacency_list[s])
+    for edge in graph.get_edges():
+        if edge.label() == 1:
+            mst_weight += edge.weight()
+    return mst_weight
 
 def read_file(filename):
     file = open(filename, "r")
-    file.readline()
-    graph = Graph()
+    vertici, archi = list(map(int, file.readline().split()))
+    graph = Graph(vertici)
     for line in file:
         tripla = list(map(int, line.split()))
         if tripla[0] != tripla[1]:
-            graph.add_edge(tripla[0]-1, tripla[1]-1, tripla[2])
+            src = graph.add_node(tripla[0]-1)
+            dest = graph.add_node(tripla[1]-1)
+            graph.add_edge(src, dest, tripla[2])
     file.close()
     return graph
 
@@ -251,14 +319,14 @@ def main(folder):
         for i,entry in enumerate(it):
             if "input_random" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
-                kruskal(graph, 0)
-                """test = entry.name.replace("input_random","output_random")
+                weight = kruskal(graph, 0)
+                test = entry.name.replace("input_random","output_random")
                 with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
-                    print("Our result: "+str(weight))
-                    print("Correct: "+str(result))
-                    print("Graph: "+str(entry.name))"""
-                break    
+                    if weight != result:
+                        print("Our result: "+str(weight))
+                        print("Correct: "+str(result))
+                        print("Graph: "+str(entry.name))
 
 if __name__ == "__main__":
     main("mst-dataset")
