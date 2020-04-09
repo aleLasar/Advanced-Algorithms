@@ -49,137 +49,47 @@
 # - Solo uno dei componenti del gruppo consegna l'elaborato, indicando i nomi dei componenti del gruppo nella relazione e nello spazio sottostante.
 # - La prima esercitazione va consegnata entro le **ore 23:55 di lunedì 4 maggio.** Consegne in ritardo comportano una penalizzazione sul voto.
 
-# %%
-class Heap():
-
-    def __init__(self):
-        self._list = []
-        self._ultimo = -1
-
-    def push(self, value):
-        self._ultimo += 1
-        self._list.append(value)
-        value._position = self._ultimo
-        self._orderup(self._ultimo)
-
-    def pop(self):
-        if self._ultimo == -1:
-            raise IndexError('Heap vuoto')
-
-        min_value = self._list[0]
-        self._list[0], self._list[self._ultimo] = self._list[self._ultimo], self._list[0]
-        self._list[0]._position, self._list[self._ultimo]._position =\
-            self._list[self._ultimo]._position, self._list[0]._position 
-        self._ultimo -= 1
-        self._orderdown(0)
-        min_value.set_present(False)
-        return min_value
-
-    def _orderup(self, index):
-        while index > 0:
-            p_index, p_value = self._get_parent(index)
-            if p_value <= self._list[index]:
-                break
-            self._list[p_index], self._list[index] = self._list[index], self._list[p_index]
-            self._list[p_index]._position, self._list[index]._position =\
-                self._list[index]._position, self._list[p_index]._position
-            index = p_index
-
-    def _orderdown(self, index):
-        while True and index <= self._ultimo:
-            value = self._list[index]
-            left_child_index, left_child_value = self._get_left_child(index)
-            right_child_index, right_child_value = self._get_right_child(index)
-            if left_child_index <= self._ultimo and right_child_index <= self._ultimo:
-                if value <= left_child_value and value <= right_child_value:
-                    break
-                if left_child_value < right_child_value:
-                    new_index = left_child_index
-                else:
-                    new_index = right_child_index
-            elif left_child_index <= self._ultimo and left_child_value <= value:
-                new_index = left_child_index
-            elif right_child_index <= self._ultimo and right_child_value <= value:
-                new_index = right_child_index
-            else:
-                break
-            self._list[new_index], self._list[index] = self._list[index], self._list[new_index]
-            self._list[new_index]._position, self._list[index]._position =\
-                self._list[index]._position, self._list[new_index]._position
-            index = new_index
-
-    def _get_parent(self, index: int):
-        if index == 0:
-            return -1, False
-        p_index = (index - 1) // 2
-        return p_index, self._list[p_index]
-
-    def _get_left_child(self, index: int):
-        left_child_index = 2 * index + 1
-        if left_child_index > self._ultimo:
-            return left_child_index, False
-        return left_child_index, self._list[left_child_index]
-
-    def _get_right_child(self, index: int):
-        right_child_index = 2 * index + 2
-        if right_child_index > self._ultimo:
-            return right_child_index, False
-        return right_child_index, self._list[right_child_index]
-
-    def __len__(self):
-        return self._ultimo+1
-
-    def __str__(self):
-        result = "["
-        for element in self._list:
-            result += str(element.key()) + ","
-        result += "]"
-        return result
-
 
 # %%
 class Node():
     
     def __init__(self,name):
         self._name = name
-        self._key = sys.maxsize
-        self._parent = None
-        self._position = None
-        self._present = True
+        self._visited = False
         self._edges = []
 
     def __gt__(self, other): 
-        if(self._key > other._key): 
+        if(self._name > other._name): 
             return True
         else: 
             return False
 
     def __lt__(self, other): 
-        if(self._key < other._key): 
+        if(self._name < other._name): 
             return True
         else: 
             return False
 
     def __le__(self, other): 
-        if(self._key <= other._key): 
+        if(self._name <= other._name): 
             return True
         else: 
             return False
 
     def __ge__(self, other): 
-        if(self._key >= other._key): 
+        if(self._name >= other._name): 
             return True
         else: 
             return False
 
     def __eq__(self, other): 
-        if(self._key == other._key): 
+        if(self._name == other._name): 
             return True
         else: 
             return False
 
     def __ne__(self, other): 
-        if(self._key != other._key): 
+        if(self._name != other._name): 
             return True
         else: 
             return False
@@ -189,39 +99,25 @@ class Node():
 
     def set_name(self,name):
         self._name = name
+        
+    def visited(self):
+        return self._visited
 
-    def key(self):
-        return self._key
-
-    def set_key(self,key):
-        self._key = key
-
-    def parent(self):
-        return self._parent
-
-    def set_parent(self, parent):
-        self._parent = parent
+    def set_visited(self, visited):
+        self._visited = visited   
 
     def edges(self):
         return self._edges
     
     def add_edge(self, edge):
-        self._edges.append(edge)
-
-    def position(self):
-        return self._position
-
-    def present(self):
-        return self._present
-
-    def set_present(self,present):
-        self._present = present
+        self._edges.append(edge)         
             
 class Edge():
 
-    def __init__(self, node, weight):
-        self._node = node
+    def __init__(self, src, dest, weight):
+        self._nodes = src, dest
         self._weight = weight
+        self._label = None
 
     def __gt__(self, other): 
         if(self._weight > other._weight): 
@@ -259,18 +155,35 @@ class Edge():
         else: 
             return False
 
+    def __str__(self):
+        return self._weight
+
     def weight(self):
         return self._weight
 
-    def node(self):
-        return self._node
+    def nodes(self):
+        return self._nodes
+        
+    def label(self):
+        return self._label
+
+    def set_label(self, label):
+        self._label = label   
+
+    def opposite(self, node):
+        if node == self._nodes[0]:
+            return self._nodes[1]
+        if node == self._nodes[1]:
+            return self._nodes[0]
+        return None                
 
 
 # %%
 class Graph():
 
-    def __init__(self,n):
+    def __init__(self, n):
         self._nodes = [None] * n
+        self._edges = []
 
     def add_node(self, name):
         if not self.is_node_present(name):
@@ -281,19 +194,22 @@ class Graph():
             return self._nodes[name]
 
     def add_edge(self, src, dest, weight):
-        edge = Edge(dest,weight)
+        edge = Edge(src, dest, weight)
+        self._edges.append(edge)
         self._nodes[src.name()].add_edge(edge)
-        edge2 = Edge(src,weight)
+        edge2 = Edge(dest, src, weight)
         self._nodes[dest.name()].add_edge(edge2)
 
-    def get_graph(self):
-        return self._nodes
-
+    def get_edges(self):
+        return self._edges
+        
+    def get_nodes(self):
+        return self._nodes    
+        
     def is_node_present(self,name):
         if self._nodes[name] is None:
             return False
-        return True
-    
+
     def isCyclic(self): 
         visited =[False]*(len(self._nodes)) 
         for i in range(len(self._nodes)): 
@@ -315,49 +231,96 @@ class Graph():
                 return True
           
         return False
+        
+    def _merge(self, left, middle, right): 
+        dim_left = middle - left + 1
+        dim_right = right - middle 
+        left_array = [0] * dim_left 
+        right_array = [0] * dim_right
+        
+        for i in range(0 , dim_left): 
+            left_array[i] = self._edges[left + i] 
+    
+        for j in range(0 , dim_right): 
+            right_array[j] = self._edges[middle + 1 + j] 
+    
+        i = 0
+        j = 0 
+        k = left
+    
+        while i < dim_left and j < dim_right : 
+            if left_array[i] <= right_array[j]: 
+                self._edges[k] = left_array[i] 
+                i += 1
+            else: 
+                self._edges[k] = right_array[j] 
+                j += 1
+            k += 1
+         
+        while i < dim_left: 
+            self._edges[k] = left_array[i] 
+            i += 1
+            k += 1
+        
+        while j < dim_right: 
+            self._edges[k] = right_array[j] 
+            j += 1
+            k += 1
+
+    def _mergeSort(self, left, right): 
+        if left < right: 
+            middle = (left + (right-1)) // 2    
+            self._mergeSort(left, middle) 
+            self._mergeSort(middle + 1, right) 
+            self._merge(left, middle, right) 
+
+    def ordinaLati(self):
+        self._mergeSort(0, len(self._edges)-1)          
+
 
 # %% [markdown]
-# # Algoritmo di Prim
+# # Algoritmo di Kruskal
 # 
-# ## Prim di base
+# ## Kruskal naive
 # 
 # ```
-# Prim(G,s)
+# Kruskal(G)
 #   
-#   X = {s}
-#   A = empty;
+#   A = {}
 # 
-#   while edge in (u,v), u in X, v not in X:
-#     (u*, v*) = light edge
-#     add v* to X
-#     add (u*, v*) to A
-# 
+#   sort edges of G by cost (mergesort)
+#   for each edge e in nondecreasing order of cost do:
+#     if A U {e} is acyclic then:
+#       A = A U {e}
 #   return A
-# ```
-# 
-# ## Prim con heap
-# 
-# ```
-# Prim(G,s)
-#   foreach u in V:
-#     key[u] = infinity
-#     parent[u] = null
-#   key[s] = 0
-#   Q = V
-#   while Q not empty:
-#     u = extractMin(Q)
-#     foreach v adjacent_to u:
-#       if v in Q and w(u,v) < key[v]:
-#         parent[v] = u
-#         key[v] = w(u,v)
-#   return V\Q
 # ```
 
 # %%
 import os
 import sys
 
-def kruskal_naive(graph):
+
+def dfs(graph, s):
+    s.set_visited(True)
+    for edge in graph.get_nodes()[s.name()].edges():
+        if not edge.label():
+            w = edge.opposite(s)
+            if w and not w.visited():
+                edge.set_label(1)
+                dfs(graph,w)
+            else:
+                edge.set_label(2)
+
+
+def kruskal(graph, s):
+    mst_weight = 0
+    graph.ordinaLati()
+    adjacency_list = graph.get_nodes()
+    dfs(graph,adjacency_list[s])
+    for edge in graph.get_edges():
+        if edge.label() == 1:
+            mst_weight += edge.weight()
+    return mst_weight
 
 def read_file(filename):
     file = open(filename, "r")
@@ -372,9 +335,29 @@ def read_file(filename):
     file.close()
     return graph
 
+<<<<<<< HEAD
 if __name__ == "__main__":
     graph = read_file('mst-dataset/input_random_01_10.txt')
     p=graph.isCyclic()
     print(p)
+=======
+def main(folder):
+    with os.scandir(folder) as it:
+        for i,entry in enumerate(it):
+            if "input_random" in entry.name:
+                graph = read_file(folder+"/"+entry.name)
+                weight = kruskal(graph, 0)
+                test = entry.name.replace("input_random","output_random")
+                with open(folder+"/"+test) as f:
+                    result = int(f.read().split()[0])
+                    if weight != result:
+                        print("Our result: "+str(weight))
+                        print("Correct: "+str(result))
+                        print("Graph: "+str(entry.name))
+
+if __name__ == "__main__":
+    main("mst-dataset")
+
+>>>>>>> 5c006497aac0dce3f7cc9ef3909fca70163f2378
 
 # %%
