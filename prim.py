@@ -364,10 +364,9 @@ def read_file(filename):
     graph = Graph(vertici)
     for line in file:
         tripla = list(map(int, line.split()))
-        if tripla[0] != tripla[1]:
-            src = graph.add_node(tripla[0]-1)
-            dest = graph.add_node(tripla[1]-1)
-            graph.add_edge(src, dest, tripla[2])
+        src = graph.add_node(tripla[0]-1)
+        dest = graph.add_node(tripla[1]-1)
+        graph.add_edge(src, dest, tripla[2])
     file.close()
     return graph
     
@@ -380,9 +379,10 @@ def main(folder):
                 test = entry.name.replace("input_random","output_random")
                 with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
-                    print("Our result: "+str(weight))
-                    print("Correct: "+str(result))
-                    print("Graph: "+str(entry.name))
+                    if weight!=result:
+                        print("Our result: "+str(weight))
+                        print("Correct: "+str(result))
+                        print("Graph: "+str(entry.name))
 
 if __name__ == "__main__":
     main("mst-dataset")
