@@ -223,20 +223,18 @@ class Graph():
         self._nodes[edge._nodes[0]._name].remove_edge(edge)
         self._nodes[edge._nodes[1]._name].remove_edge(edge)
 
-    def isCyclic(self): 
+    def isCyclic(self, edge): 
         visited =[False]*self.num_vertici()
-        for i in range(self.num_vertici()): 
-            if visited[i] ==False and not self._nodes[i] is None:
-                if(self._isCyclicUtil(i,visited,-1))== True: 
-                    return True
-          
+        for i in edge._nodes:
+            if visited[i._name] ==False and not self._nodes[i._name] is None:
+                if(self._isCyclicUtil(i._name,visited,-1))== True: 
+                    return True        
         return False
     
     def _isCyclicUtil(self,v:int,visited,parent): 
         visited[v]= True
         vicini = self._nodes[v]._edges
         for i in vicini: #i = Edge
-            p=i._nodes[1]._name
             if  visited[i._nodes[1]._name]==False :  
                 if(self._isCyclicUtil(i._nodes[1]._name,visited,v)): 
                     return True
@@ -338,7 +336,7 @@ def kruskal(graph, s):
         s1 = mst.add_node(edge._nodes[0]._name)
         d1 = mst.add_node(edge._nodes[1]._name)
         mst.add_edge(s1, d1, edge._weight)
-        if not mst.isCyclic():
+        if not mst.isCyclic(edge):
             mst_weight += edge._weight
         else:
             mst.remove_edge(mst.get_edges().pop())
