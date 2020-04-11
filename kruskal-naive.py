@@ -209,11 +209,16 @@ class Graph():
     def is_node_present(self,name):
         if self._nodes[name] is None:
             return False
+        else:
+            return True
+    
+    def num_vertici(self):
+        return len(self._nodes)
 
     def isCyclic(self): 
-        visited =[False]*(len(self._nodes)) 
-        for i in range(len(self._nodes)): 
-            if visited[i] ==False:
+        visited =[False]*self.num_vertici()
+        for i in range(self.num_vertici()): 
+            if visited[i] ==False and not self._nodes[i] is None:
                 if(self._isCyclicUtil(i,visited,-1))== True: 
                     return True
           
@@ -223,11 +228,12 @@ class Graph():
         visited[v]= True
         vicini = self._nodes[v]._edges
         for i in vicini: #i = Edge
-            if  visited[i._node._name]==False :  
-                if(self._isCyclicUtil(i._node._name,visited,v)): 
+            p=i._nodes[1]._name
+            if  visited[i._nodes[1]._name]==False :  
+                if(self._isCyclicUtil(i._nodes[1]._name,visited,v)): 
                     return True
             #non considero loop i self-loop tra due nodi (anche con diversi archi)
-            elif  parent!=i._node._name:    
+            elif  parent!=i._nodes[1]._name:    
                 return True
           
         return False
@@ -310,8 +316,27 @@ def dfs(graph, s):
                 dfs(graph,w)
             else:
                 edge.set_label(2)
+"""
+DUBBI:
+-la comlessità generale è influenzata da isCycling
+-se faccio coppia profonda complessità?
+"""
 
-
+def kruskal(graph, s):
+    mst_weight = 0
+    mst = Graph(graph.num_vertici())
+    graph.ordinaLati()
+    for edge in graph.get_edges():
+        #non fa copia profonda
+        mst_aux = mst      
+        s1 = mst_aux.add_node(edge._nodes[0]._name)
+        d1 = mst_aux.add_node(edge._nodes[1]._name)
+        mst_aux.add_edge(s1, d1, edge._weight)
+        if not mst_aux.isCyclic():
+            mst = mst_aux
+            mst_weight += edge._weight
+    return mst_weight
+"""
 def kruskal(graph, s):
     mst_weight = 0
     graph.ordinaLati()
@@ -321,7 +346,7 @@ def kruskal(graph, s):
         if edge.label() == 1:
             mst_weight += edge.weight()
     return mst_weight
-
+"""
 def read_file(filename):
     file = open(filename, "r")
     vertici, archi = list(map(int, file.readline().split()))
