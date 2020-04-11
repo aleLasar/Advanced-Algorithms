@@ -111,7 +111,10 @@ class Node():
     
     def add_edge(self, edge):
         self._edges.append(edge)         
-            
+
+    def remove_edge(self, edge):
+       del self._edges[-1]           
+
 class Edge():
 
     def __init__(self, src, dest, weight):
@@ -214,6 +217,11 @@ class Graph():
     
     def num_vertici(self):
         return len(self._nodes)
+
+    def remove_edge(self, edge):
+        self._edges.pop()
+        self._nodes[edge._nodes[0]._name].remove_edge(edge)
+        self._nodes[edge._nodes[1]._name].remove_edge(edge)
 
     def isCyclic(self): 
         visited =[False]*self.num_vertici()
@@ -327,14 +335,13 @@ def kruskal(graph, s):
     mst = Graph(graph.num_vertici())
     graph.ordinaLati()
     for edge in graph.get_edges():
-        #non fa copia profonda
-        mst_aux = mst      
-        s1 = mst_aux.add_node(edge._nodes[0]._name)
-        d1 = mst_aux.add_node(edge._nodes[1]._name)
-        mst_aux.add_edge(s1, d1, edge._weight)
-        if not mst_aux.isCyclic():
-            mst = mst_aux
+        s1 = mst.add_node(edge._nodes[0]._name)
+        d1 = mst.add_node(edge._nodes[1]._name)
+        mst.add_edge(s1, d1, edge._weight)
+        if not mst.isCyclic():
             mst_weight += edge._weight
+        else:
+            mst.remove_edge(mst.get_edges().pop())
     return mst_weight
 """
 def kruskal(graph, s):
@@ -369,6 +376,7 @@ def main(folder):
                 test = entry.name.replace("input_random","output_random")
                 with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
+                    print("albero_"+str(i))
                     if weight != result:
                         print("Our result: "+str(weight))
                         print("Correct: "+str(result))
