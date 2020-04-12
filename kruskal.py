@@ -55,6 +55,8 @@ class Node():
     
     def __init__(self,name):
         self._name = name
+        self._visited = False
+        self._edges = []
 
     def __gt__(self, other): 
         if(self._name > other._name): 
@@ -97,12 +99,28 @@ class Node():
 
     def set_name(self,name):
         self._name = name
-            
+        
+    def visited(self):
+        return self._visited
+
+    def set_visited(self, visited):
+        self._visited = visited   
+
+    def edges(self):
+        return self._edges
+    
+    def add_edge(self, edge):
+        self._edges.append(edge)         
+
+    def remove_edge(self, edge):
+       del self._edges[-1]           
+
 class Edge():
 
     def __init__(self, src, dest, weight):
         self._nodes = src, dest
         self._weight = weight
+        self._label = None
 
     def __gt__(self, other): 
         if(self._weight > other._weight): 
@@ -140,45 +158,179 @@ class Edge():
         else: 
             return False
 
+    def __str__(self):
+        return self._weight
+
     def weight(self):
         return self._weight
 
     def nodes(self):
         return self._nodes
+        
+    def label(self):
+        return self._label
 
+    def set_label(self, label):
+        self._label = label   
+
+    def opposite(self, node):
+        if node == self._nodes[0]:
+            return self._nodes[1]
+        if node == self._nodes[1]:
+            return self._nodes[0]
+        return None                
+
+
+# %%
+class UnionFind():
+
+    def __init__(self, n):
+        self._parents = [None] * n
+        for i in range(0, n):
+            self._parents[i] = i        
+
+    def find(self, x, depth=0):
+        if (x != self._parents[x]):
+            return self.find(self._parents[x], depth+1)
+        return x, depth
+
+    def union(self, x, y):
+        set_x, depth_x = self.find(x)
+        set_y, depth_y = self.find(y)
+        if(set_x == set_y):
+            return
+        if(depth_x > depth_y):
+            self._parents[set_y] = set_x
+        else:
+            self._parents[set_x] = set_y
 
 # %%
 class Graph():
 
-    def __init__(self,n):
-        self._edges = [None] * n
+    def __init__(self, n):
+        self._nodes = [None] * n
+        self._edges = []
 
     def add_node(self, name):
-        pass
+        if not self.is_node_present(name):
+            node = Node(name)
+            self._nodes[name] = node
+            return node
+        else:
+            return self._nodes[name]
 
     def add_edge(self, src, dest, weight):
-        pass
+        edge = Edge(src, dest, weight)
+        self._edges.append(edge)
+        self._nodes[src.name()].add_edge(edge)
+        edge2 = Edge(dest, src, weight)
+        self._nodes[dest.name()].add_edge(edge2)
 
-    def get_graph(self):
+    def get_edges(self):
         return self._edges
-
+        
+    def get_nodes(self):
+        return self._nodes    
+        
+    def is_node_present(self, name):
+        if self._nodes[name] is None:
+            return False
+        else:
+            return True
     
+    def num_vertici(self):
+        return len(self._nodes)
+
+    def remove_edge(self, edge):
+        self._edges.pop()
+        self._nodes[edge._nodes[0]._name].remove_edge(edge)
+        self._nodes[edge._nodes[1]._name].remove_edge(edge)
+
+    def isCyclic(self, edge): 
+        visited =[False]*self.num_vertici()
+        for i in edge._nodes:
+            if visited[i._name] ==False and not self._nodes[i._name] is None:
+                if(self._isCyclicUtil(i._name,visited,-1))== True: 
+                    return True        
+        return False
+    
+    def _isCyclicUtil(self,v:int,visited,parent): 
+        visited[v]= True
+        vicini = self._nodes[v]._edges
+        for i in vicini: #i = Edge
+            if  visited[i._nodes[1]._name]==False :  
+                if(self._isCyclicUtil(i._nodes[1]._name,visited,v)): 
+                    return True
+            #non considero loop i self-loop tra due nodi (anche con diversi archi)
+            elif  parent!=i._nodes[1]._name:    
+                return True
+          
+        return False
+        
+    def _merge(self, left, middle, right): 
+        dim_left = middle - left + 1
+        dim_right = right - middle 
+        left_array = [0] * dim_left 
+        right_array = [0] * dim_right
+        
+        for i in range(0 , dim_left): 
+            left_array[i] = self._edges[left + i] 
+    
+        for j in range(0 , dim_right): 
+            right_array[j] = self._edges[middle + 1 + j] 
+    
+        i = 0
+        j = 0 
+        k = left
+    
+        while i < dim_left and j < dim_right : 
+            if left_array[i] <= right_array[j]: 
+                self._edges[k] = left_array[i] 
+                i += 1
+            else: 
+                self._edges[k] = right_array[j] 
+                j += 1
+            k += 1
+         
+        while i < dim_left: 
+            self._edges[k] = left_array[i] 
+            i += 1
+            k += 1
+        
+        while j < dim_right: 
+            self._edges[k] = right_array[j] 
+            j += 1
+            k += 1
+
+    def _mergeSort(self, left, right): 
+        if left < right: 
+            middle = (left + (right-1)) // 2    
+            self._mergeSort(left, middle) 
+            self._mergeSort(middle + 1, right) 
+            self._merge(left, middle, right) 
+
+    def ordinaLati(self):
+        self._mergeSort(0, len(self._edges)-1)          
+
 
 # %% [markdown]
 # # Algoritmo di Kruskal
 # 
-# ## Kruskal naive
+# ## Kruskal
 # 
 # ```
 # Kruskal(G)
 #   
 #   A = {}
 # 
-#   sort edges of G by cost (mergesort)
-#   for each edge e in nondecreasing order of cost do:
-#     if A U {e} is acyclic then:
-#       A = A U {e}
+#   U = initialize(V)
+#   sort edges of E by cost
+#   for each edge = (v,w) in non decreasing order of cost do:
+#       if find(U,v) != find(U,w):
+#           A = A U {(v,w)}
+#           Union(U,v,w)
 #   return A
+#
 # ```
 
 # %%
@@ -186,13 +338,51 @@ import os
 import sys
 
 def kruskal(graph, s):
-    pass  
+    mst_weight = 0
+    mst = Graph(graph.num_vertici())
+    union_find = UnionFind(graph.num_vertici())
+    graph.ordinaLati()
+    for edge in graph.get_edges():
+        if union_find.find(edge.nodes()[0].name()) != union_find.find(edge.nodes()[1].name()):
+            s1 = mst.add_node(edge.nodes()[0].name())
+            d1 = mst.add_node(edge.nodes()[1].name())
+            mst.add_edge(s1, d1, edge._weight)
+            union_find.union(s1.name(), d1.name())
+            mst_weight += edge.weight()
+        else:
+            print("cycle")    
+    return mst_weight
 
 def read_file(filename):
-    pass
+    file = open(filename, "r")
+    vertici, archi = list(map(int, file.readline().split()))
+    graph = Graph(vertici)
+    for line in file:
+        tripla = list(map(int, line.split()))
+        if tripla[0] != tripla[1]:
+            src = graph.add_node(tripla[0]-1)
+            dest = graph.add_node(tripla[1]-1)
+            graph.add_edge(src, dest, tripla[2])
+    file.close()
+    return graph
+
+def main(folder):
+    with os.scandir(folder) as it:
+        for i,entry in enumerate(it):
+            if "input_random" in entry.name:
+                graph = read_file(folder+"/"+entry.name)
+                weight = kruskal(graph, 0)
+                test = entry.name.replace("input_random","output_random")
+                with open(folder+"/"+test) as f:
+                    result = int(f.read().split()[0])
+                    if weight != result:
+                        print("Our result: "+str(weight))
+                        print("Correct: "+str(result))
+                        print("Graph: "+str(entry.name))
+                        break
 
 if __name__ == "__main__":
-    pass
+    main("mst-dataset")
 
 
 # %%
