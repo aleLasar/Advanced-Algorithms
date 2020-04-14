@@ -59,40 +59,22 @@ class Node():
         self._edges = []
 
     def __gt__(self, other): 
-        if(self._name > other._name): 
-            return True
-        else: 
-            return False
+        return self._name > other._name
 
     def __lt__(self, other): 
-        if(self._name < other._name): 
-            return True
-        else: 
-            return False
+        return self._name < other._name
 
     def __le__(self, other): 
-        if(self._name <= other._name): 
-            return True
-        else: 
-            return False
+        return self._name <= other._name
 
     def __ge__(self, other): 
-        if(self._name >= other._name): 
-            return True
-        else: 
-            return False
+        return self._name >= other._name
 
     def __eq__(self, other): 
-        if(self._name == other._name): 
-            return True
-        else: 
-            return False
+        return self._name == other._name
 
     def __ne__(self, other): 
-        if(self._name != other._name): 
-            return True
-        else: 
-            return False
+        return self._name != other._name
 
     def name(self):
         return self._name
@@ -123,40 +105,22 @@ class Edge():
         self._label = None
 
     def __gt__(self, other): 
-        if(self._weight > other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight > other._weight
 
     def __lt__(self, other): 
-        if(self._weight < other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight < other._weight
 
     def __le__(self, other): 
-        if(self._weight <= other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight <= other._weight
 
     def __ge__(self, other): 
-        if(self._weight >= other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight >= other._weight
 
     def __eq__(self, other): 
-        if(self._weight == other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight == other._weight
 
     def __ne__(self, other): 
-        if(self._weight != other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight != other._weight
 
     def __str__(self):
         return self._weight
@@ -245,27 +209,6 @@ class Graph():
         self._edges.pop()
         self._nodes[edge._nodes[0]._name].remove_edge(edge)
         self._nodes[edge._nodes[1]._name].remove_edge(edge)
-
-    def isCyclic(self, edge): 
-        visited =[False]*self.num_vertici()
-        for i in edge._nodes:
-            if visited[i._name] ==False and not self._nodes[i._name] is None:
-                if(self._isCyclicUtil(i._name,visited,-1))== True: 
-                    return True        
-        return False
-    
-    def _isCyclicUtil(self,v:int,visited,parent): 
-        visited[v]= True
-        vicini = self._nodes[v]._edges
-        for i in vicini: #i = Edge
-            if  visited[i._nodes[1]._name]==False :  
-                if(self._isCyclicUtil(i._nodes[1]._name,visited,v)): 
-                    return True
-            #non considero loop i self-loop tra due nodi (anche con diversi archi)
-            elif  parent!=i._nodes[1]._name:    
-                return True
-          
-        return False
         
     def _merge(self, left, middle, right): 
         dim_left = middle - left + 1
@@ -343,14 +286,14 @@ def kruskal(graph, s):
     union_find = UnionFind(graph.num_vertici())
     graph.ordinaLati()
     for edge in graph.get_edges():
-        if union_find.find(edge.nodes()[0].name()) != union_find.find(edge.nodes()[1].name()):
+        x = union_find.find(edge.nodes()[0].name())
+        y = union_find.find(edge.nodes()[1].name())
+        if x[0] != y[0]:
             s1 = mst.add_node(edge.nodes()[0].name())
             d1 = mst.add_node(edge.nodes()[1].name())
             mst.add_edge(s1, d1, edge._weight)
             union_find.union(s1.name(), d1.name())
-            mst_weight += edge.weight()
-        else:
-            print("cycle")    
+            mst_weight += edge.weight()    
     return mst_weight
 
 def read_file(filename):
@@ -359,10 +302,9 @@ def read_file(filename):
     graph = Graph(vertici)
     for line in file:
         tripla = list(map(int, line.split()))
-        if tripla[0] != tripla[1]:
-            src = graph.add_node(tripla[0]-1)
-            dest = graph.add_node(tripla[1]-1)
-            graph.add_edge(src, dest, tripla[2])
+        src = graph.add_node(tripla[0]-1)
+        dest = graph.add_node(tripla[1]-1)
+        graph.add_edge(src, dest, tripla[2])
     file.close()
     return graph
 

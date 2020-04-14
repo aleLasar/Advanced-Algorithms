@@ -127,7 +127,7 @@ class Heap():
         return right_child_index, self._list[right_child_index]
 
     def __len__(self):
-        return self._ultimo+1
+        return self._ultimo + 1
 
     def __str__(self):
         result = "["
@@ -149,40 +149,22 @@ class Node():
         self._edges = []
 
     def __gt__(self, other): 
-        if(self._key > other._key): 
-            return True
-        else: 
-            return False
+        return self._key > other._key
 
     def __lt__(self, other): 
-        if(self._key < other._key): 
-            return True
-        else: 
-            return False
+        return self._key < other._key
 
     def __le__(self, other): 
-        if(self._key <= other._key): 
-            return True
-        else: 
-            return False
+        return self._key <= other._key
 
     def __ge__(self, other): 
-        if(self._key >= other._key): 
-            return True
-        else: 
-            return False
+        return self._key >= other._key
 
     def __eq__(self, other): 
-        if(self._key == other._key): 
-            return True
-        else: 
-            return False
+        return self._key == other._key
 
     def __ne__(self, other): 
-        if(self._key != other._key): 
-            return True
-        else: 
-            return False
+        return self._key != other._key
 
     def name(self):
         return self._name
@@ -224,40 +206,22 @@ class Edge():
         self._weight = weight
 
     def __gt__(self, other): 
-        if(self._weight > other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight > other._weight
 
     def __lt__(self, other): 
-        if(self._weight < other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight < other._weight
 
     def __le__(self, other): 
-        if(self._weight <= other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight <= other._weight
 
     def __ge__(self, other): 
-        if(self._weight >= other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight >= other._weight
 
     def __eq__(self, other): 
-        if(self._weight == other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight == other._weight
 
     def __ne__(self, other): 
-        if(self._weight != other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight != other._weight
 
     def weight(self):
         return self._weight
@@ -290,9 +254,7 @@ class Graph():
         return self._nodes
 
     def is_node_present(self,name):
-        if self._nodes[name] is None:
-            return False
-        return True
+        return self._nodes[name] is not None
 
 # %% [markdown]
 # # Algoritmo di Prim
@@ -344,7 +306,6 @@ def prim(graph, s):
         heap_keys.push(node)
     while len(heap_keys) !=0:
         u = heap_keys.pop()
-        #print("Node: "+str(u.name()+1))
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
             v = edge.node()
@@ -352,9 +313,6 @@ def prim(graph, s):
                 v.set_parent(u)
                 v.set_key(edge.weight())
                 heap_keys._orderup(v._position)
-        """if u.parent():
-            print("  parent: "+str(u.parent().name()+1))
-        print("  key: "+str(u.key()))"""
         mst_weight += u.key()
     return mst_weight    
 

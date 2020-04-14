@@ -59,40 +59,22 @@ class Node():
         self._edges = []
 
     def __gt__(self, other): 
-        if(self._name > other._name): 
-            return True
-        else: 
-            return False
+        return self._name > other._name
 
     def __lt__(self, other): 
-        if(self._name < other._name): 
-            return True
-        else: 
-            return False
+        return self._name < other._name
 
     def __le__(self, other): 
-        if(self._name <= other._name): 
-            return True
-        else: 
-            return False
+        return self._name <= other._name
 
     def __ge__(self, other): 
-        if(self._name >= other._name): 
-            return True
-        else: 
-            return False
+        return self._name >= other._name
 
     def __eq__(self, other): 
-        if(self._name == other._name): 
-            return True
-        else: 
-            return False
+        return self._name == other._name
 
     def __ne__(self, other): 
-        if(self._name != other._name): 
-            return True
-        else: 
-            return False
+        return self._name != other._name
 
     def name(self):
         return self._name
@@ -123,40 +105,22 @@ class Edge():
         self._label = None
 
     def __gt__(self, other): 
-        if(self._weight > other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight > other._weight
 
     def __lt__(self, other): 
-        if(self._weight < other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight < other._weight
 
     def __le__(self, other): 
-        if(self._weight <= other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight <= other._weight
 
     def __ge__(self, other): 
-        if(self._weight >= other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight >= other._weight
 
     def __eq__(self, other): 
-        if(self._weight == other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight == other._weight
 
     def __ne__(self, other): 
-        if(self._weight != other._weight): 
-            return True
-        else: 
-            return False
+        return self._weight != other._weight
 
     def __str__(self):
         return self._weight
@@ -226,22 +190,20 @@ class Graph():
     def isCyclic(self, edge): 
         visited =[False]*self.num_vertici()
         for i in edge._nodes:
-            if visited[i._name] ==False and not self._nodes[i._name] is None:
-                if(self._isCyclicUtil(i._name,visited,-1))== True: 
+            if not visited[i._name] and not self._nodes[i._name] is None:
+                if(self._isCyclicUtil(i._name,visited,-1)): 
                     return True        
         return False
     
-    def _isCyclicUtil(self,v:int,visited,parent): 
+    def _isCyclicUtil(self, v:int, visited, parent): 
         visited[v]= True
         vicini = self._nodes[v]._edges
         for i in vicini: #i = Edge
             if  visited[i._nodes[1]._name]==False :  
                 if(self._isCyclicUtil(i._nodes[1]._name,visited,v)): 
                     return True
-            #non considero loop i self-loop tra due nodi (anche con diversi archi)
-            elif  parent!=i._nodes[1]._name:    
+            elif parent != i._nodes[1]._name:    
                 return True
-          
         return False
         
     def _merge(self, left, middle, right): 
@@ -322,11 +284,6 @@ def dfs(graph, s):
                 dfs(graph,w)
             else:
                 edge.set_label(2)
-"""
-DUBBI:
--la comlessità generale è influenzata da isCycling
--se faccio coppia profonda complessità?
-"""
 
 def kruskal(graph, s):
     mst_weight = 0
@@ -341,27 +298,16 @@ def kruskal(graph, s):
         else:
             mst.remove_edge(mst.get_edges().pop())
     return mst_weight
-"""
-def kruskal(graph, s):
-    mst_weight = 0
-    graph.ordinaLati()
-    adjacency_list = graph.get_nodes()
-    dfs(graph,adjacency_list[s])
-    for edge in graph.get_edges():
-        if edge.label() == 1:
-            mst_weight += edge.weight()
-    return mst_weight
-"""
+
 def read_file(filename):
     file = open(filename, "r")
     vertici, archi = list(map(int, file.readline().split()))
     graph = Graph(vertici)
     for line in file:
         tripla = list(map(int, line.split()))
-        if tripla[0] != tripla[1]:
-            src = graph.add_node(tripla[0]-1)
-            dest = graph.add_node(tripla[1]-1)
-            graph.add_edge(src, dest, tripla[2])
+        src = graph.add_node(tripla[0]-1)
+        dest = graph.add_node(tripla[1]-1)
+        graph.add_edge(src, dest, tripla[2])
     file.close()
     return graph
 
@@ -374,7 +320,6 @@ def main(folder):
                 test = entry.name.replace("input_random","output_random")
                 with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
-                    print("albero_"+str(i))
                     if weight != result:
                         print("Our result: "+str(weight))
                         print("Correct: "+str(result))
