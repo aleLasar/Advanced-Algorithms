@@ -272,15 +272,12 @@ class Graph():
 # %%
 import os
 import sys
-
+import time
 
 def dfs_cycle(graph, s):
     s.set_visited(True)
-    #print("Node: "+str(s.name()+1))
     for edge in graph.get_nodes()[s.name()].edges():
-        #print("  Edge: "+str(edge.weight()))
         if edge.mst():
-            #print("    edge in mst")
             if not edge.label():
                 w = edge.opposite(s)
                 if w and not w.visited():
@@ -288,7 +285,6 @@ def dfs_cycle(graph, s):
                     w.set_parent(s)
                     dfs_cycle(graph,w)
                 else:
-                    #print("    make cycle")
                     edge.set_label(2)
                     edge.set_ancestor(w)
 
@@ -302,10 +298,8 @@ def kruskal(graph, s):
             e.set_label(None)    
         edge.set_mst(True)
         dfs_cycle(graph, edge.nodes()[0])
-        #print("end dfs")
         if 2 in list(map(lambda x: x.label(), graph.get_edges())):
             edge.set_mst(False)
-            #print("Edge out: "+str(edge.weight()))
         else:
             mst_weight += edge.weight()           
     return mst_weight    
@@ -327,7 +321,9 @@ def main(folder):
         for i,entry in enumerate(it):
             if "input_random" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
+                start = time.time()
                 weight = kruskal(graph, 0)
+                time_exec = time.time() - start
                 test = entry.name.replace("input_random","output_random")
                 with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
@@ -335,7 +331,10 @@ def main(folder):
                         print("Our result: "+str(weight))
                         print("Correct: "+str(result))
                         print("Graph: "+str(entry.name))
-                        break
+                    else:
+                        result_time = open(folder+"/"+entry.name+"_time", "a")
+                        result_time.write("Kruskal naive: "+str(time_exec))
+                        result_time.close()    
 
 if __name__ == "__main__":
     main("mst-dataset")

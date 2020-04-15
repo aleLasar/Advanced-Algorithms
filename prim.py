@@ -296,6 +296,7 @@ class Graph():
 # %%
 import os
 import sys
+import time
 
 def prim(graph, s):
     mst_weight = 0
@@ -333,15 +334,21 @@ def main(folder):
         for i,entry in enumerate(it):
             if "input_random" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
+                start = time.time()
                 weight = prim(graph, 0)
+                time_exec = time.time() - start
                 test = entry.name.replace("input_random","output_random")
                 with open(folder+"/"+test) as f:
                     result = int(f.read().split()[0])
-                    if weight!=result:
+                    if weight != result:
                         print("Our result: "+str(weight))
                         print("Correct: "+str(result))
                         print("Graph: "+str(entry.name))
-
+                    else:
+                        result_time = open(folder+"/"+entry.name+"_time", "a")
+                        result_time.write("Prim: "+str(time_exec))
+                        result_time.close()
+                        
 if __name__ == "__main__":
     main("mst-dataset")
     
