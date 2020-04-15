@@ -187,8 +187,7 @@ class Graph():
         edge = Edge(src, dest, weight)
         self._edges.append(edge)
         self._nodes[src.name()].add_edge(edge)
-        edge2 = Edge(dest, src, weight)
-        self._nodes[dest.name()].add_edge(edge2)
+        self._nodes[dest.name()].add_edge(edge)
 
     def get_edges(self):
         return self._edges

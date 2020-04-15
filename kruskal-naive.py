@@ -57,6 +57,8 @@ class Node():
         self._name = name
         self._visited = False
         self._edges = []
+        self._parent = None
+        self._mst = False
 
     def __gt__(self, other): 
         return self._name > other._name
@@ -94,8 +96,17 @@ class Node():
     def add_edge(self, edge):
         self._edges.append(edge)         
 
-    def remove_edge(self, edge):
-       del self._edges[-1]           
+    def parent(self):
+        return self._parent
+
+    def set_parent(self, parent):
+        self._parent = parent
+
+    def mst(self):
+        return self._mst
+
+    def set_mst(self, mst):
+        self._mst = mst                      
 
 class Edge():
 
@@ -103,6 +114,8 @@ class Edge():
         self._nodes = src, dest
         self._weight = weight
         self._label = None
+        self._ancestor = None
+        self._mst = False
 
     def __gt__(self, other): 
         return self._weight > other._weight
@@ -142,7 +155,19 @@ class Edge():
             return self._nodes[1]
         if node == self._nodes[1]:
             return self._nodes[0]
-        return None                
+        return None
+
+    def ancestor(self):
+        return self._ancestor
+
+    def set_ancestor(self, ancestor):
+        self._ancestor = ancestor
+
+    def mst(self):
+        return self._mst
+
+    def set_mst(self, mst):
+        self._mst = mst
 
 
 # %%
@@ -164,8 +189,7 @@ class Graph():
         edge = Edge(src, dest, weight)
         self._edges.append(edge)
         self._nodes[src.name()].add_edge(edge)
-        edge2 = Edge(dest, src, weight)
-        self._nodes[dest.name()].add_edge(edge2)
+        self._nodes[dest.name()].add_edge(edge)
 
     def get_edges(self):
         return self._edges
@@ -181,30 +205,6 @@ class Graph():
     
     def num_vertici(self):
         return len(self._nodes)
-
-    def remove_edge(self, edge):
-        self._edges.pop()
-        self._nodes[edge._nodes[0]._name].remove_edge(edge)
-        self._nodes[edge._nodes[1]._name].remove_edge(edge)
-
-    def isCyclic(self, edge): 
-        visited =[False]*self.num_vertici()
-        for i in edge._nodes:
-            if not visited[i._name] and not self._nodes[i._name] is None:
-                if(self._isCyclicUtil(i._name,visited,-1)): 
-                    return True        
-        return False
-    
-    def _isCyclicUtil(self, v:int, visited, parent): 
-        visited[v]= True
-        vicini = self._nodes[v]._edges
-        for i in vicini: #i = Edge
-            if  visited[i._nodes[1]._name]==False :  
-                if(self._isCyclicUtil(i._nodes[1]._name,visited,v)): 
-                    return True
-            elif parent != i._nodes[1]._name:    
-                return True
-        return False
         
     def _merge(self, left, middle, right): 
         dim_left = middle - left + 1
@@ -274,30 +274,41 @@ import os
 import sys
 
 
-def dfs(graph, s):
+def dfs_cycle(graph, s):
     s.set_visited(True)
+    #print("Node: "+str(s.name()+1))
     for edge in graph.get_nodes()[s.name()].edges():
-        if not edge.label():
-            w = edge.opposite(s)
-            if w and not w.visited():
-                edge.set_label(1)
-                dfs(graph,w)
-            else:
-                edge.set_label(2)
+        #print("  Edge: "+str(edge.weight()))
+        if edge.mst():
+            #print("    edge in mst")
+            if not edge.label():
+                w = edge.opposite(s)
+                if w and not w.visited():
+                    edge.set_label(1)
+                    w.set_parent(s)
+                    dfs_cycle(graph,w)
+                else:
+                    #print("    make cycle")
+                    edge.set_label(2)
+                    edge.set_ancestor(w)
 
 def kruskal(graph, s):
-    mst_weight = 0
-    mst = Graph(graph.num_vertici())
     graph.ordinaLati()
+    mst_weight = 0
     for edge in graph.get_edges():
-        s1 = mst.add_node(edge._nodes[0]._name)
-        d1 = mst.add_node(edge._nodes[1]._name)
-        mst.add_edge(s1, d1, edge._weight)
-        if not mst.isCyclic(edge):
-            mst_weight += edge._weight
+        for node in graph.get_nodes():
+            node.set_visited(False)
+        for e in graph.get_edges():
+            e.set_label(None)    
+        edge.set_mst(True)
+        dfs_cycle(graph, edge.nodes()[0])
+        #print("end dfs")
+        if 2 in list(map(lambda x: x.label(), graph.get_edges())):
+            edge.set_mst(False)
+            #print("Edge out: "+str(edge.weight()))
         else:
-            mst.remove_edge(mst.get_edges().pop())
-    return mst_weight
+            mst_weight += edge.weight()           
+    return mst_weight    
 
 def read_file(filename):
     file = open(filename, "r")
@@ -324,6 +335,7 @@ def main(folder):
                         print("Our result: "+str(weight))
                         print("Correct: "+str(result))
                         print("Graph: "+str(entry.name))
+                        break
 
 if __name__ == "__main__":
     main("mst-dataset")
