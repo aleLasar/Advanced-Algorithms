@@ -345,10 +345,10 @@ def main(folder):
                         print("Correct: "+str(result))
                         print("Graph: "+str(entry.name))
                     else:
-                        result_time = open(folder+"/"+entry.name+"_time", "a")
-                        result_time.write("Prim: "+str(time_exec))
+                        result_time = open(folder+"/"+test+"_time", "a")
+                        result_time.write("\nPrim: "+str(time_exec))
                         result_time.close()
-                        
+
 if __name__ == "__main__":
     main("mst-dataset")
     
