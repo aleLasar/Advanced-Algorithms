@@ -55,9 +55,8 @@ class Node():
     
     def __init__(self,name):
         self._name = name
-        self._visited = False
         self._edges = []
-        self._parent = None
+        self._component = None
         self._mst = False
 
     def __gt__(self, other): 
@@ -82,13 +81,7 @@ class Node():
         return self._name
 
     def set_name(self,name):
-        self._name = name
-        
-    def visited(self):
-        return self._visited
-
-    def set_visited(self, visited):
-        self._visited = visited   
+        self._name = name 
 
     def edges(self):
         return self._edges
@@ -96,25 +89,17 @@ class Node():
     def add_edge(self, edge):
         self._edges.append(edge)         
 
-    def parent(self):
-        return self._parent
+    def component(self):
+        return self._component
 
-    def set_parent(self, parent):
-        self._parent = parent
-
-    def mst(self):
-        return self._mst
-
-    def set_mst(self, mst):
-        self._mst = mst                      
+    def set_component(self, component):
+        self._component = component                           
 
 class Edge():
 
     def __init__(self, src, dest, weight):
         self._nodes = src, dest
         self._weight = weight
-        self._label = None
-        self._ancestor = None
         self._mst = False
 
     def __gt__(self, other): 
@@ -143,12 +128,6 @@ class Edge():
 
     def nodes(self):
         return self._nodes
-        
-    def label(self):
-        return self._label
-
-    def set_label(self, label):
-        self._label = label   
 
     def opposite(self, node):
         if node == self._nodes[0]:
@@ -156,12 +135,6 @@ class Edge():
         if node == self._nodes[1]:
             return self._nodes[0]
         return None
-
-    def ancestor(self):
-        return self._ancestor
-
-    def set_ancestor(self, ancestor):
-        self._ancestor = ancestor
 
     def mst(self):
         return self._mst
@@ -274,34 +247,42 @@ import os
 import sys
 import time
 
-def dfs_cycle(graph, s):
-    s.set_visited(True)
+def dfs_component(graph, s):
     for edge in graph.get_nodes()[s.name()].edges():
         if edge.mst():
-            if not edge.label():
-                w = edge.opposite(s)
-                if w and not w.visited():
-                    edge.set_label(1)
-                    w.set_parent(s)
-                    dfs_cycle(graph,w)
-                else:
-                    edge.set_label(2)
-                    edge.set_ancestor(w)
+            w = edge.opposite(s)
+            if w and w.component() != s.component():
+                w.set_component(s.component())
+                dfs_component(graph, w)
 
 def kruskal(graph, s):
     graph.ordinaLati()
     mst_weight = 0
-    for edge in graph.get_edges():
-        for node in graph.get_nodes():
-            node.set_visited(False)
-        for e in graph.get_edges():
-            e.set_label(None)    
+    visitati = [False] * graph.num_vertici()
+    componente = 0
+    for edge in graph.get_edges(): 
+        node1 = edge.nodes()[0]
+        node2 = edge.nodes()[1]
         edge.set_mst(True)
-        dfs_cycle(graph, edge.nodes()[0])
-        if 2 in list(map(lambda x: x.label(), graph.get_edges())):
-            edge.set_mst(False)
+        if node1 == node2:
+             edge.set_mst(False)
+        elif not visitati[node1.name()] and not visitati[node2.name()]:
+            componente+=1
+            node1.set_component(componente)
+            node2.set_component(componente)
+        elif not visitati[node1.name()]:
+            node1.set_component(node2.component())
+        elif not visitati[node2.name()]:
+            node2.set_component(node1.component())
         else:
-            mst_weight += edge.weight()           
+            if node1.component() != node2.component():
+                dfs_component(graph, node1)
+            else:
+                edge.set_mst(False)
+        visitati[node1.name()] = True
+        visitati[node2.name()] = True        
+        if edge.mst():
+             mst_weight += edge.weight()          
     return mst_weight    
 
 def read_file(filename):
@@ -334,7 +315,7 @@ def main(folder):
                     else:
                         result_time = open(folder+"/"+test+"_time", "a")
                         result_time.write("\nKruskal naive: "+str(time_exec))
-                        result_time.close()    
+                        result_time.close()
 
 if __name__ == "__main__":
     main("mst-dataset")
