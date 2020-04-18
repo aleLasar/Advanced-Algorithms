@@ -86,7 +86,7 @@ class Heap():
             index = p_index
 
     def _orderdown(self, index):
-        while True and index <= self._ultimo:
+        while index <= self._ultimo:
             value = self._list[index]
             left_child_index, left_child_value = self._get_left_child(index)
             right_child_index, right_child_value = self._get_right_child(index)
