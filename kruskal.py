@@ -291,7 +291,7 @@ def kruskal(graph, s):
         if x[0] != y[0]:
             s1 = mst.add_node(edge.nodes()[0].name())
             d1 = mst.add_node(edge.nodes()[1].name())
-            mst.add_edge(s1, d1, edge._weight)
+            mst.add_edge(s1, d1, edge.weight())
             union_find.union(s1.name(), d1.name())
             mst_weight += edge.weight()    
     return mst_weight
