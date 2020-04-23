@@ -247,13 +247,13 @@ import os
 import sys
 import time
 
-def dfs_component(graph, s):
+def fix_component(graph, s):
     for edge in graph.get_nodes()[s.name()].edges():
         if edge.mst():
             w = edge.opposite(s)
             if w and w.component() != s.component():
                 w.set_component(s.component())
-                dfs_component(graph, w)
+                fix_component(graph, w)
 
 def kruskal(graph, s):
     graph.ordinaLati()
@@ -276,7 +276,7 @@ def kruskal(graph, s):
             node2.set_component(node1.component())
         else:
             if node1.component() != node2.component():
-                dfs_component(graph, node1)
+                fix_component(graph, node1)
             else:
                 edge.set_mst(False)
         visitati[node1.name()] = True
