@@ -265,7 +265,7 @@ def kruskal(graph, s):
         node2 = edge.nodes()[1]
         edge.set_mst(True)
         if node1 == node2:
-             edge.set_mst(False)
+            edge.set_mst(False)
         elif not visitati[node1.name()] and not visitati[node2.name()]:
             componente+=1
             node1.set_component(componente)
