@@ -1,16 +1,16 @@
 \chapter{Originalità\label{sec:originalita}}
-\noindent Qui vengono presentate alcune specialità usate nell'implementazione.
+\noindent In questa sezione vengono presentate le originalità che abbiamo inserito nella nostra implementazione dei tre algoritmi.
 
 \section{Kruskal naive\label{sec:originalitanaives}}
 
-Per quanto riguarda l'implementazione di Kruskal naive, per cercare la ciclicità ci siamo basati sulle componenti connesse nella costruzione di un mst partendo da un grafo, principio simile a quello adottato da Kruskal con Union Find.
+Per quanto riguarda l'implementazione di Kruskal-naive, per cercare la ciclicità ci siamo basati sulle componenti connesse nella costruzione di un mst partendo da un grafo, principio simile a quello adottato da Kruskal con Union Find.
 Quando viene aggiunto un lato al MST, si controllano i nodi su cui tale lato incide.
-Se tali nodi fanno parte della stessa componente connessa, il lato viene rimosso, altrimenti formerebbe un ciclo.
+Se tali nodi fanno parte della stessa componente connessa, allora il lato non viene aggiunto perchè altrimenti formerebbe un ciclo.
 In caso contrario viene aggiunto, e si aggiornano le componenti connesse di alcuni nodi, in modo da ottenerne una sola.
 
-La ricerca di ciclicità è corretta per costruzione.
+Per come l'abbiamo implementata, la ricerca di ciclicità è corretta per costruzione.
 
-La complessità sembra inferiore a O(mn), perché vengono aggiornati solamente i nodi del MST con componente connessa errata e solamente quando essa è errata.
-Resta in ogni caso superiore a Prim e Kruskal con Union Find, perché non viene fatta alcuna considerazione sul modo in cui viene aggiornata tale componente.
+Inoltre sembra che la complessità sia inferiore a O(mn), perché vengono aggiornati solamente i nodi del MST ??????con componente connessa errata e solamente quando essa è errata??????.
+Resta in ogni caso superiore a Prim e Kruskal, perché non viene fatta alcuna considerazione sul modo in cui viene aggiornata tale componente.
 Nel caso peggiore, ovvero quando il grafo dato fosse un MST, e gli archi avessero una disposizione tale da essere aggiunti in modo da aggiornare sempre la componente connessa di n-1 nodi, la complessità risulterebbe O(mn/2).
-Senza considerare la costante l'algoritmo implementato è O(mn).
+???????Senza considerare la costante l'algoritmo implementato è O(mn)???????.
