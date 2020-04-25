@@ -22,6 +22,7 @@
 \usepackage{frontespizio}
 \usepackage{float}
 \usepackage{tabularx}
+\usepackage{ltablex}
 \usepackage{indentfirst}
 \usepackage{microtype}
 \usepackage{setspace}
@@ -35,6 +36,8 @@
 \newcommand{\mail}[1]{\href{mailto:#1}{\texttt{#1}}}
 \newcommand{\omissis}{[\textellipsis\unkern]}
 \newcommand{\inglese}[1]{\foreignlanguage{english}{\em #1}}
+\usepackage{siunitx}
+\sisetup{round-mode=places, round-precision=6, table-number-alignment=center}
 \newcolumntype{Y}{>{\centering\arraybackslash}X}
 \onehalfspacing
 \renewcommand{\tablename}{}
