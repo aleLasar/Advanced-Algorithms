@@ -12,4 +12,4 @@ Per come l'abbiamo implementata, la ricerca di ciclicità è corretta per costru
 
 Inoltre sembra che la complessità sia inferiore a O(mn), perché qualora i nodi appartengano a due componenti distinte e venga aggiunto un arco tra essi, vengono aggiornati solamente i nodi del MST con componente connessa da aggiornare.
 Resta in ogni caso superiore a Prim e Kruskal, perché non viene fatta alcuna considerazione sul modo in cui viene aggiornata tale componente.
-Nel caso peggiore, ovvero quando il grafo dato fosse un MST, e gli archi avessero una disposizione tale da essere aggiunti in modo da aggiornare sempre la componente connessa di n-1 nodi, la complessità risulterebbe O(mn/2), quindi O(mn).
+Nel caso peggiore, ovvero quando il grafo dato fosse un MST, e gli archi avessero una disposizione tale da essere aggiunti in modo da aggiornare sempre la componente connessa di n-1 nodi, la complessità risulterebbe O(mn).
