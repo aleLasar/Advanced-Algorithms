@@ -5,12 +5,12 @@
 Gli algoritmi implementati sono:
 \begin{itemize}
     \item Prim, implementato con Heap;
-    \item Kruskal nella sua implementazione ``naive'' di complessità O(mn);
+    \item Kruskal nella sua implementazione naive di complessità O(mn);
     \item Kruskal implementato con Union-Find
 \end{itemize}
 
 In seguito riportiamo lo pseudocodice degli algoritmi, e la parte saliente del codice implementato in Python in modo da confrontarli facilmente.
-Per rendere più facile la compressione della relazione, intenderemo con Kruskal-naive l'implementazione dell'algoritmo di Kruskal con complessità O(mn) mentre ci riferiremo semplicemente con Kruskal al medesimo all'algoritmo che utilizza la struttura dati Union-Find.
+Per rendere più facile la comprensione della relazione, indichiamo con Kruskal-naive l'implementazione dell'algoritmo di Kruskal con complessità O(mn) mentre ci riferiamo semplicemente con Kruskal al medesimo algoritmo che utilizza la struttura dati Union-Find.
 \clearpage
 
 \subsection{Algoritmo di Prim\label{sec:prim}}
@@ -100,11 +100,12 @@ Per rappresentare il grafo abbiamo usato una lista di adiacenza, in cui ogni nod
     return mst_weight
 \end{minted}
 
-L'algoritmo prevede l'ordinamento dei lati in modo crescente, per farlo efficiente abbiamo implementato un metodo nella classe Graph che utilizza l'algoritmo Merge Sort per ordinarli.
+L'algoritmo prevede l'ordinamento dei lati in modo crescente.
+Per realizzarlo in modo efficiente abbiamo implementato un metodo nella classe Graph che utilizza l'algoritmo Merge Sort per ordinarli.
 In questa versione dell'algoritmo verifichiamo su quali componenti connesse incide un lato del minimum spanning tree in costruzione.
 Nel caso in cui il lato non incida in nessuna componente connessa, quest'ultimo andrà a creare una nuova componente connessa.
 Invece, se il lato che si cerca di aggiungere va ad incidere su due nodi che appartengono alla medesima componente connessa allora si formerebbe un ciclo e quindi il lato non viene aggiunto.
-Mentre se vengano connesse due componenti connesse distinte viene usato un approccio a DFS per ridurle ad un'unica componente connessa.
+Mentre se vengano connesse due componenti connesse distinte viene usato un approccio DFS per ridurle ad un'unica componente connessa.
 In tutti gli altri casi il lato viene semplicemente aggiunto.
 
 \clearpage
