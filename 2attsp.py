@@ -27,7 +27,7 @@ class Heap():
         min_value = self._list[0]
         self._list[0], self._list[self._ultimo] = self._list[self._ultimo], self._list[0]
         self._list[0]._position, self._list[self._ultimo]._position =\
-            self._list[self._ultimo]._position, self._list[0]._position 
+            self._list[self._ultimo]._position, self._list[0]._position
         self._ultimo -= 1
         self._orderdown(0)
         min_value.set_present(False)
@@ -97,7 +97,7 @@ class Heap():
 #%%
 
 class Node():
-    
+
     def __init__(self,name, latitude, longitude):
         self._name = name
         self._key = sys.maxsize
@@ -109,22 +109,22 @@ class Node():
         self._longitude = longitude
         self._children = []
 
-    def __gt__(self, other): 
+    def __gt__(self, other):
         return self._key > other._key
 
-    def __lt__(self, other): 
+    def __lt__(self, other):
         return self._key < other._key
 
-    def __le__(self, other): 
+    def __le__(self, other):
         return self._key <= other._key
 
-    def __ge__(self, other): 
+    def __ge__(self, other):
         return self._key >= other._key
 
-    def __eq__(self, other): 
+    def __eq__(self, other):
         return self._key == other._key
 
-    def __ne__(self, other): 
+    def __ne__(self, other):
         return self._key != other._key
 
     def name(self):
@@ -147,7 +147,7 @@ class Node():
 
     def edges(self):
         return self._edges
-    
+
     def add_edge(self, edge):
         self._edges.append(edge)
 
@@ -177,39 +177,39 @@ class Node():
     def longitude_rad(self):
         deg = int(self._longitude)
         rounded = self._longitude - deg
-        return PI * (deg + 5.0 * rounded / 3.0) / 180.0    
+        return PI * (deg + 5.0 * rounded / 3.0) / 180.0
 
     def set_longitude(self,longitude):
-        self._longitude = longitude 
+        self._longitude = longitude
 
     def children(self):
         return self._children
 
     def add_child(self,child):
-        self._children.append(child)         
-            
+        self._children.append(child)
+
 class Edge():
 
     def __init__(self, node, weight):
         self._node = node
         self._weight = weight
 
-    def __gt__(self, other): 
+    def __gt__(self, other):
         return self._weight > other._weight
 
-    def __lt__(self, other): 
+    def __lt__(self, other):
         return self._weight < other._weight
 
-    def __le__(self, other): 
+    def __le__(self, other):
         return self._weight <= other._weight
 
-    def __ge__(self, other): 
+    def __ge__(self, other):
         return self._weight >= other._weight
 
-    def __eq__(self, other): 
+    def __eq__(self, other):
         return self._weight == other._weight
 
-    def __ne__(self, other): 
+    def __ne__(self, other):
         return self._weight != other._weight
 
     def weight(self):
@@ -246,10 +246,10 @@ class Graph():
         return self._nodes[name] is not None
 
     def geo_distance(self, src, dest):
-        q1 = math.cos( abs(src.longitude_rad() - dest.longitude_rad()) )
-        q2 = math.cos( abs(src.latitude_rad() - dest.latitude_rad()) )
+        q1 = math.cos( src.longitude_rad() - dest.longitude_rad() )
+        q2 = math.cos( src.latitude_rad() - dest.latitude_rad())
         q3 = math.cos( src.latitude_rad() + dest.latitude_rad())
-        return int(abs(( RRR * math.acos( 0.5*((1.0+q1)*q2 - (1.0-q1)*q3) ) + 1.0)))
+        return int( RRR * math.acos( 0.5*((1.0+q1)*q2 - (1.0-q1)*q3) ) + 1.0)
 
     def euclide_distance(self, src, dest):
         x = abs(src.latitude() - dest.latitude())
@@ -270,7 +270,7 @@ def prim(graph, s):
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
             v = edge.node()
-            if( v.present() and edge.weight() < v.key()):
+            if(v.present() and edge.weight() < v.key()):
                 v.set_parent(u)
                 v.set_key(edge.weight())
                 heap_keys._orderup(v._position)
@@ -278,9 +278,9 @@ def prim(graph, s):
     for node in adjacency_list:
         if node.parent():
             parent = node.parent()
-            parent.add_child(node)    
+            parent.add_child(node)
     #return graph
-    
+
 def preorder(preordered, v):
     preordered.append(v)
     for child in v.children():
@@ -292,7 +292,7 @@ def approx_t_tsp(graph,s):
     preordered = []
     preorder(preordered, nodes[s])
     preordered.append(nodes[s])
-    return preordered        
+    return preordered
 
 def read_file(filename):
     file = open(filename, "r")
@@ -328,7 +328,7 @@ def read_file(filename):
             if type == "GEO":
                 graph.add_edge(src, dest, graph.geo_distance(src,dest))
             else:
-                graph.add_edge(src, dest, graph.euclide_distance(src,dest)) 
+                graph.add_edge(src, dest, graph.euclide_distance(src,dest))
     file.close()
     return graph
 
@@ -340,10 +340,11 @@ def main(folder):
                 graph = read_file(folder+"/"+entry.name)
                 #start = time.time()
                 preordered = approx_t_tsp(graph, 0)
+                weight = 0
                 for node in preordered:
-                    print("Node: "+str(node.name()+1))
-                    if(node.parent()):
-                        print("  Parent: "+str(node.parent().name()+1))
+                    print(str(node.key()))
+                    weight += node.key()
+                print(weight)
                 break
                 """time_exec = time.time() - start
                 test = entry.name.replace("input_random","output_random")
@@ -360,5 +361,5 @@ def main(folder):
 
 if __name__ == "__main__":
     main("tsp_dataset")
-    
-#%%    
+
+#%%
