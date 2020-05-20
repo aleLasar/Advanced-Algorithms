@@ -1,0 +1,148 @@
+\chapter{Introduzione\label{sec:introduzione}}
+\noindent La relazione descrive gli algoritmi implementati da Alessio Lazzaron e Matteo Marchiori per il primo laboratorio del corso di algoritmi avanzati.
+
+\section{Descrizione degli algoritmi\label{sec:descrizione}}
+Gli algoritmi implementati sono:
+\begin{itemize}
+    \item Prim, implementato con Heap;
+    \item Kruskal nella sua implementazione naive di complessità O(mn);
+    \item Kruskal implementato con Union-Find
+\end{itemize}
+
+In seguito riportiamo lo pseudocodice degli algoritmi, e la parte saliente del codice implementato in Python in modo da confrontarli facilmente.
+Per rendere più facile la compressione della relazione, intenderemo con Kruskal-naive l'implementazione dell'algoritmo di Kruskal con complessità O(mn) mentre ci riferiremo semplicemente con Kruskal al medesimo algoritmo che utilizza la struttura dati Union-Find.
+
+
+\subsection{Algoritmo di Prim\label{sec:prim}}
+\begin{verbatim}
+    Prim(G,s)
+        foreach u in V:
+            key[u] = infinity
+            parent[u] = null
+        key[s] = 0
+        Q = V
+        while Q not empty:
+            u = extractMin(Q)
+            foreach v adjacent_to u:
+                if v in Q and w(u,v) < key[v]:
+                    parent[v] = u
+                    key[v] = w(u,v)
+        return V\Q
+\end{verbatim}
+
+\begin{minted}{python}
+    def prim(graph, s):
+        mst_weight = 0
+        adjacency_list = graph.get_graph()
+        adjacency_list[s].set_key(0)
+        heap_keys = Heap()
+        for node in adjacency_list:
+            heap_keys.push(node)
+        while len(heap_keys) !=0:
+            u = heap_keys.pop()
+            adjacents = adjacency_list[u.name()].edges()
+            for edge in adjacents:
+                v = edge.node()
+                if( v.present() and edge.weight() < v.key()):
+                    v.set_parent(u)
+                    v.set_key(edge.weight())
+                    heap_keys._orderup(v._position)
+            mst_weight += u.key()
+        return mst_weight
+\end{minted}
+
+Abbiamo implementato la struttura Heap rappresentandola come una lista di nodi del grafo, che possiedono una chiave per cui vale la proprietà di min heap.
+I nodi possiedono inoltre un campo che identifica la posizione all'interno dello heap, per poterlo riordinare quando vengono spostati, e un campo present per verificare se il nodo in questione fa parte dello heap o meno.
+Per rappresentare il grafo abbiamo usato una lista di adiacenza, in cui ogni nodo ha una lista di archi incidenti in esso, e ogni arco mantiene l'informazione relativa al nodo opposto.
+
+\clearpage
+
+\subsection{Algoritmo di Kruskal-naive}
+\begin{verbatim}
+    Kruskal(G)
+        A = {}
+        sort edges of G by cost (mergesort)
+        for each edge e in nondecreasing order of cost do:
+            if A U {e} is acyclic then:
+                A = A U {e}
+        return A
+\end{verbatim}    
+
+\begin{minted}{python}
+    def kruskal(graph, s):
+    graph.ordinaLati()
+    mst_weight = 0
+    visitati = [False] * graph.num_vertici()
+    componente = 0
+    for edge in graph.get_edges(): 
+        node1 = edge.nodes()[0]
+        node2 = edge.nodes()[1]
+        edge.set_mst(True)
+        if node1 == node2:
+            edge.set_mst(False)
+        elif not visitati[node1.name()] and not visitati[node2.name()]:
+            componente+=1
+            node1.set_component(componente)
+            node2.set_component(componente)
+        elif not visitati[node1.name()]:
+            node1.set_component(node2.component())
+        elif not visitati[node2.name()]:
+            node2.set_component(node1.component())
+        else:
+            if node1.component() != node2.component():
+                fix_component(graph, node1)
+            else:
+                edge.set_mst(False)
+        visitati[node1.name()] = True
+        visitati[node2.name()] = True        
+        if edge.mst():
+             mst_weight += edge.weight()          
+    return mst_weight
+\end{minted}
+
+L'algoritmo prevede l'ordinamento dei lati in modo crescente.
+Per realizzarlo in modo efficiente abbiamo implementato un metodo nella classe Graph che utilizza l'algoritmo Merge Sort per ordinarli.
+In questa versione dell'algoritmo verifichiamo su quali componenti connesse incide un lato del minimum spanning tree in costruzione.
+Nel caso in cui il lato non incida in nessuna componente connessa, quest'ultimo andrà a creare una nuova componente connessa.
+Invece, se il lato che si cerca di aggiungere va ad incidere su due nodi che appartengono alla medesima componente connessa allora si formerebbe un ciclo e quindi il lato non viene aggiunto.
+Mentre se vengano connesse due componenti connesse distinte viene usato un approccio DFS per ridurle ad un'unica componente connessa.
+In tutti gli altri casi il lato viene semplicemente aggiunto.
+
+\clearpage
+
+\subsection{Algoritmo di Kruskal\label{sec:kruskal}}
+\begin{verbatim}
+    Kruskal(G)
+        A = {}
+        U = initialize(V)
+        sort edges of E by cost
+        for each edge = (v,w) in non decreasing order of cost do:
+            if find(U,v) != find(U,w):
+                A = A U {(v,w)}
+                Union(U,v,w)
+        return A
+\end{verbatim}
+
+\begin{minted}{python}
+    def kruskal(graph, s):
+    mst_weight = 0
+    mst = Graph(graph.num_vertici())
+    union_find = UnionFind(graph.num_vertici())
+    graph.ordinaLati()
+    for edge in graph.get_edges():
+        x = union_find.find(edge.nodes()[0].name())
+        y = union_find.find(edge.nodes()[1].name())
+        if x[0] != y[0]:
+            s1 = mst.add_node(edge.nodes()[0].name())
+            d1 = mst.add_node(edge.nodes()[1].name())
+            mst.add_edge(s1, d1, edge._weight)
+            union_find.union(s1.name(), d1.name())
+            mst_weight += edge.weight()    
+    return mst_weight
+\end{minted}
+
+Per rappresentare la struttura Union-Find abbiamo usato una lista di interi, che rappresentano i nomi dei nodi.
+La nostra implementazione, di tale struttura, rispetta quanto visto a lezione sia per complessità, sia per le operazioni permesse (init, union e find).
+
+\subsection{Scelte implementative comuni\label{sec:comuni}}
+Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.
