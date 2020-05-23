@@ -36,6 +36,9 @@ class Node():
 
     def __ne__(self, other):
         return self._key != other._key
+    
+    def __hash__(self):
+        return hash(self._name)
 
     def name(self):
         return self._name
@@ -100,7 +103,9 @@ class Node():
 
     #dest = Node
     def find_edge(self, dest):
-        return (x for x in self._edges if x._node == dest)
+        for i, val in enumerate(self._edges):
+            if val.node() == dest:
+                return val
 
 class Edge():
 
@@ -169,28 +174,40 @@ class Graph():
         y = abs(src.longitude() - dest.longitude())
         return int(math.sqrt(math.pow(x,2)+math.pow(y,2)))
 
+    def get_nodes(self):
+        return self._nodes
+
+def held_karp(G):
+    d_dict = dict()
+    p_dict = dict()
+    S = G.get_nodes()
+    start = S[0]
+    S.remove(S[0])
+    held_karp_ric(start, S[1], S, d_dict, p_dict)
+    print("ciao")
+
 """
-start =  nodo di partenza
 v = nodo
 S = lista di vertici
 d_dict = dizionario: indici [n, str(S)]
 p_dict = dizionario: indici [n, str(S)]
 """
-def held_karp(start, v, S: list, d_dict: dict, p_dict):
+def held_karp_ric(start, v, S: list, d_dict: dict, p_dict):
     if len(S) == 1 and S[0] == v:
-        return start.find_edge(v)._weight
-    elif d_dict.get(n, str(S)) !=None:
-        return d_dict
+        return start.find_edge(v).weight()
+    elif any((v, str(S)) in sub for sub in d_dict):
+        return d_dict.get((v, str(S)))
     else:
         mindist = float("Inf")
         minprec = None
-        S.remove(v)
-        for i in len(S):
-            dist= held_karp(start, S[i], S, d_dict, p_dict)
-            uv_weight = S[i].find_edge(v)._weight
+        newlist = S 
+        newlist.remove(v)
+        for i, val in enumerate(newlist):
+            dist = held_karp_ric(start, val, newlist, d_dict, p_dict)
+            uv_weight = val.find_edge(v).weight()
             if(dist + uv_weight < mindist):
                 mindist = dist + uv_weight
-                minprec = S[i]
+                minprec = val
         d_dict[v, str(S)] = mindist
         p_dict[v, str(S)] = minprec
         return mindist
@@ -241,10 +258,7 @@ def main(folder):
         for i,entry in enumerate(it):
             if "ulysses16" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
-                d_dist = dict()
-                p_dist = dict()
-                #start, n, , S,d_dist, p_dist,
-                held_karp(graph._nodes[1], graph._nodes[2], graph._nodes, d_dist, p_dict)
+                held_karp(graph)
 
 
 
