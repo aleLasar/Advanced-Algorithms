@@ -37,6 +37,9 @@ class Node():
 
     def __ne__(self, other):
         return self._key != other._key
+    
+    def __hash__(self):
+        return hash(self._name)
 
     def name(self):
         return self._name
@@ -101,12 +104,9 @@ class Node():
 
     #dest = Node
     def find_edge(self, dest):
-        for x in self._edges:
-            if x.node() == dest:
-                return x
-        return None        
-
-
+        for i, val in enumerate(self._edges):
+            if val.node() == dest:
+                return val
 class Edge():
 
     def __init__(self, node, weight):
@@ -175,14 +175,24 @@ class Graph():
         return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
 
 
+    def get_nodes(self):
+        return self._nodes
+
+def held_karp(G):
+    d_dict = dict()
+    p_dict = dict()
+    S = G.get_nodes()
+    start = S[0]
+    S.remove(S[0])
+    held_karp_ric(start, S[1], S, d_dict, p_dict)
+    print("ciao")
+
 """
-start =  nodo di partenza
 v = nodo
 S = lista di vertici
 d_dict = dizionario: indici [n, str(S)]
 p_dict = dizionario: indici [n, str(S)]
 """
-
 
 def held_karp(start, v, S: list, d_dict, p_dict):
     if len(S) == 1 and v in S:
@@ -202,7 +212,7 @@ def held_karp(start, v, S: list, d_dict, p_dict):
                 minprec = S[i]
         d_dict[(str(v.name()+1), str(S))] = mindist
         p_dict[(str(v.name()+1), str(S))] = minprec
-        return mindist      
+        return mindist
 
 
 def read_file(filename):
@@ -253,8 +263,7 @@ def main(folder):
                 p_dist = {}
                 nodes = graph.get_graph()
                 dist = held_karp(nodes[0], nodes[0], nodes, d_dist, p_dist)
-                print(str(dist))          
-
+                print(str(dist))
 
 if __name__ == "__main__":
     main("tsp_dataset")
