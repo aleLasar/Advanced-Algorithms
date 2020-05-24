@@ -1,10 +1,16 @@
 import math
 import os
 import sys
+from threading import Timer
 import time
 
 PI = 3.141592
 RRR = 6378.388
+stop = False
+
+def timeover():
+    global stop
+    stop = True
 
 class Node():
     
@@ -261,11 +267,10 @@ p_dict = dizionario: indici [n, str(S)]
 """
 
 def held_karp(start, v, S: list, d_dict, p_dict):
+    global stop
     if len(S) == 1 and v in S:
-        #print(str(v.name()+1)+" "+str(v.find_edge(start).weight()))
         return v.find_edge(start).weight()
     elif (str(v.name()+1), str(S)) in d_dict:
-        #print("("+str(v.name()+1)+" "+str(S)+")" + " "+ str(d_dict[(str(v.name()+1), str(S))]))
         return d_dict[(str(v.name()+1), str(S))]
     else:
         mindist = float("Inf")
@@ -278,8 +283,9 @@ def held_karp(start, v, S: list, d_dict, p_dict):
             if(dist + uv_weight < mindist):
                 mindist = dist + uv_weight
                 minprec = S2[i]
+            if stop:
+                break    
         d_dict[(str(v.name()+1), str(S))] = mindist
-        #print(str(d_dict))
         p_dict[(str(v.name()+1), str(S))] = minprec
         return mindist
 
@@ -317,23 +323,32 @@ def read_file(filename):
             dest = nodes[index_dest]
             if "GEO" in type:
                 graph.add_edge(src, dest, graph.geo_distance(src, dest))
-                print("Src:"+str(src.name()+1)+" Dest:"+str(dest.name()+1)+" Weight:"+str(graph.geo_distance(src, dest)))
             else:
                 graph.add_edge(src, dest, graph.euclide_distance(src, dest))
     file.close()
     return graph
 
 
-def main(folder):
+def main(folder, timeout):
     with os.scandir(folder) as it:
         for i, entry in enumerate(it):
-            if "burma14" in entry.name:
+            if "ulysses16.tsp" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
                 d_dist = {}
                 p_dist = {}
                 nodes = graph.get_nodes()
+                global stop
+                stop = False
+                t = Timer(timeout, timeover)
+                t.start()
+                start = time.time()
                 dist = held_karp(nodes[0], nodes[0], nodes, d_dist, p_dist)
-                print(str(dist))
+                time_exec = time.time() - start
+                t.cancel()
+                test = entry.name.replace(".tsp",".out")
+                result = open(folder+"/"+test, "w")
+                result.write("\nHeld Karp - soluzione: "+str(dist)+" tempo: "+str(time_exec))
+                result.close()
 
 if __name__ == "__main__":
-    main("tsp_dataset")
+    main("tsp_dataset", int(sys.argv[1]))
