@@ -6,81 +6,64 @@ import time
 PI = 3.141592
 RRR = 6378.388
 
-
 class Node():
-
+    
     def __init__(self, name, latitude, longitude):
         self._name = name
-        self._key = sys.maxsize
-        self._parent = None
-        self._position = None
-        self._present = True
+        self._visited = False
         self._edges = []
         self._latitude = latitude
         self._longitude = longitude
-        self._children = []
 
-    def __gt__(self, other):
-        return self._key > other._key
+    def __gt__(self, other): 
+        return self._name > other._name
 
-    def __lt__(self, other):
-        return self._key < other._key
+    def __lt__(self, other): 
+        return self._name < other._name
 
-    def __le__(self, other):
-        return self._key <= other._key
+    def __le__(self, other): 
+        return self._name <= other._name
 
-    def __ge__(self, other):
-        return self._key >= other._key
+    def __ge__(self, other): 
+        return self._name >= other._name
 
-    def __eq__(self, other):
-        return self._key == other._key
+    def __eq__(self, other): 
+        return self._name == other._name
 
-    def __ne__(self, other):
-        return self._key != other._key
-    
-    def __hash__(self):
-        return hash(self._name)
+    def __ne__(self, other): 
+        return self._name != other._name
+
+    def __repr__(self):
+        return str(self._name+1)    
 
     def name(self):
         return self._name
 
-    def set_name(self, name):
+    def set_name(self,name):
         self._name = name
+        
+    def visited(self):
+        return self._visited
 
-    def key(self):
-        return self._key
-
-    def set_key(self, key):
-        self._key = key
-
-    def parent(self):
-        return self._parent
-
-    def set_parent(self, parent):
-        self._parent = parent
+    def set_visited(self, visited):
+        self._visited = visited   
 
     def edges(self):
         return self._edges
-
+    
     def add_edge(self, edge):
-        self._edges.append(edge)
+        self._edges.append(edge)         
 
-    def position(self):
-        return self._position
-
-    def present(self):
-        return self._present
-
-    def set_present(self, present):
-        self._present = present
-
+    def remove_edge(self, edge):
+       del self._edges[-1]
+       
     def latitude(self):
         return self._latitude
 
     def latitude_rad(self):
         deg = int(self._latitude)
         rounded = self._latitude - deg
-        return PI * (deg + 5.0 * rounded / 3.0) / 180.0
+        return PI * (deg + 5.0 * (rounded / 3.0)) / 180.0
 
     def set_latitude(self, latitude):
         self._latitude = latitude
@@ -91,57 +74,93 @@ class Node():
     def longitude_rad(self):
         deg = int(self._longitude)
         rounded = self._longitude - deg
-        return PI * (deg + 5.0 * rounded / 3.0) / 180.0
+        return PI * (deg + 5.0 * (rounded / 3.0)) / 180.0
 
     def set_longitude(self, longitude):
         self._longitude = longitude
 
-    def children(self):
-        return self._children
-
-    def add_child(self, child):
-        self._children.append(child)
-
-    #dest = Node
     def find_edge(self, dest):
         for i, val in enumerate(self._edges):
-            if val.node() == dest:
-                return val
+            if val.opposite(self) == dest:
+                return val               
+
 class Edge():
 
-    def __init__(self, node, weight):
-        self._node = node
+    def __init__(self, src, dest, weight):
+        self._nodes = src, dest
         self._weight = weight
+        self._label = None
 
-    def __gt__(self, other):
+    def __gt__(self, other): 
         return self._weight > other._weight
 
-    def __lt__(self, other):
+    def __lt__(self, other): 
         return self._weight < other._weight
 
-    def __le__(self, other):
+    def __le__(self, other): 
         return self._weight <= other._weight
 
-    def __ge__(self, other):
+    def __ge__(self, other): 
         return self._weight >= other._weight
 
-    def __eq__(self, other):
+    def __eq__(self, other): 
         return self._weight == other._weight
 
-    def __ne__(self, other):
+    def __ne__(self, other): 
         return self._weight != other._weight
+
+    def __str__(self):
+        return self._weight
 
     def weight(self):
         return self._weight
 
-    def node(self):
-        return self._node
+    def nodes(self):
+        return self._nodes
+        
+    def label(self):
+        return self._label
+
+    def set_label(self, label):
+        self._label = label   
+
+    def opposite(self, node):
+        if node == self._nodes[0]:
+            return self._nodes[1]
+        if node == self._nodes[1]:
+            return self._nodes[0]
+        return None                
 
 
+# %%
+class UnionFind():
+
+    def __init__(self, n):
+        self._parents = [None] * n
+        for i in range(0, n):
+            self._parents[i] = i        
+
+    def find(self, x, depth=0):
+        if (x != self._parents[x]):
+            return self.find(self._parents[x], depth+1)
+        return x, depth
+
+    def union(self, x, y):
+        set_x, depth_x = self.find(x)
+        set_y, depth_y = self.find(y)
+        if(set_x == set_y):
+            return
+        if(depth_x > depth_y):
+            self._parents[set_y] = set_x
+        else:
+            self._parents[set_x] = set_y
+
+# %%
 class Graph():
 
     def __init__(self, n):
         self._nodes = [None] * n
+        self._edges = []
 
     def add_node(self, name, latitude, longitude):
         if not self.is_node_present(name):
@@ -152,17 +171,76 @@ class Graph():
             return self._nodes[name]
 
     def add_edge(self, src, dest, weight):
-        edge = Edge(dest, weight)
+        edge = Edge(src, dest, weight)
+        self._edges.append(edge)
         self._nodes[src.name()].add_edge(edge)
-        edge2 = Edge(src, weight)
-        self._nodes[dest.name()].add_edge(edge2)
+        self._nodes[dest.name()].add_edge(edge)
 
-    def get_graph(self):
-        return self._nodes
-
+    def get_edges(self):
+        return self._edges
+        
+    def get_nodes(self):
+        return self._nodes    
+        
     def is_node_present(self, name):
-        return self._nodes[name] is not None
+        if self._nodes[name] is None:
+            return False
+        else:
+            return True
+    
+    def num_vertici(self):
+        return len(self._nodes)
 
+    def remove_edge(self, edge):
+        self._edges.pop()
+        self._nodes[edge._nodes[0]._name].remove_edge(edge)
+        self._nodes[edge._nodes[1]._name].remove_edge(edge)
+        
+    def _merge(self, left, middle, right): 
+        dim_left = middle - left + 1
+        dim_right = right - middle 
+        left_array = [0] * dim_left 
+        right_array = [0] * dim_right
+        
+        for i in range(0 , dim_left): 
+            left_array[i] = self._edges[left + i] 
+    
+        for j in range(0 , dim_right): 
+            right_array[j] = self._edges[middle + 1 + j] 
+    
+        i = 0
+        j = 0 
+        k = left
+    
+        while i < dim_left and j < dim_right : 
+            if left_array[i] <= right_array[j]: 
+                self._edges[k] = left_array[i] 
+                i += 1
+            else: 
+                self._edges[k] = right_array[j] 
+                j += 1
+            k += 1
+         
+        while i < dim_left: 
+            self._edges[k] = left_array[i] 
+            i += 1
+            k += 1
+        
+        while j < dim_right: 
+            self._edges[k] = right_array[j] 
+            j += 1
+            k += 1
+
+    def _mergeSort(self, left, right): 
+        if left < right: 
+            middle = (left + (right-1)) // 2    
+            self._mergeSort(left, middle) 
+            self._mergeSort(middle + 1, right) 
+            self._merge(left, middle, right) 
+
+    def ordinaLati(self):
+        self._mergeSort(0, len(self._edges)-1)
+        
     def geo_distance(self, src, dest):
         q1 = math.cos(src.longitude_rad() - dest.longitude_rad())
         q2 = math.cos(src.latitude_rad() - dest.latitude_rad())
@@ -172,20 +250,8 @@ class Graph():
     def euclide_distance(self, src, dest):
         x = abs(src.latitude() - dest.latitude())
         y = abs(src.longitude() - dest.longitude())
-        return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
+        return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))    
 
-
-    def get_nodes(self):
-        return self._nodes
-
-def held_karp(G):
-    d_dict = dict()
-    p_dict = dict()
-    S = G.get_nodes()
-    start = S[0]
-    S.remove(S[0])
-    held_karp_ric(start, S[1], S, d_dict, p_dict)
-    print("ciao")
 
 """
 v = nodo
@@ -196,8 +262,10 @@ p_dict = dizionario: indici [n, str(S)]
 
 def held_karp(start, v, S: list, d_dict, p_dict):
     if len(S) == 1 and v in S:
+        #print(str(v.name()+1)+" "+str(v.find_edge(start).weight()))
         return v.find_edge(start).weight()
     elif (str(v.name()+1), str(S)) in d_dict:
+        #print("("+str(v.name()+1)+" "+str(S)+")" + " "+ str(d_dict[(str(v.name()+1), str(S))]))
         return d_dict[(str(v.name()+1), str(S))]
     else:
         mindist = float("Inf")
@@ -205,12 +273,13 @@ def held_karp(start, v, S: list, d_dict, p_dict):
         S2 = list(S)
         S2.remove(v)
         for i in range(len(S2)):
-            dist = held_karp(start, S[i], S2, d_dict, p_dict)
-            uv_weight = S[i].find_edge(v).weight()
+            dist = held_karp(start, S2[i], S2, d_dict, p_dict)
+            uv_weight = S2[i].find_edge(v).weight()
             if(dist + uv_weight < mindist):
                 mindist = dist + uv_weight
-                minprec = S[i]
+                minprec = S2[i]
         d_dict[(str(v.name()+1), str(S))] = mindist
+        #print(str(d_dict))
         p_dict[(str(v.name()+1), str(S))] = minprec
         return mindist
 
@@ -241,13 +310,14 @@ def read_file(filename):
         else:
             tripla = list(map(int, map(round, map(float, line.split()))))
         graph.add_node(int(tripla[0])-1, tripla[1], tripla[2])
-    nodes = graph.get_graph()
+    nodes = graph.get_nodes()
     for index_src in range(len(nodes)):
         for index_dest in range(index_src+1, len(nodes)):
             src = nodes[index_src]
             dest = nodes[index_dest]
             if "GEO" in type:
                 graph.add_edge(src, dest, graph.geo_distance(src, dest))
+                print("Src:"+str(src.name()+1)+" Dest:"+str(dest.name()+1)+" Weight:"+str(graph.geo_distance(src, dest)))
             else:
                 graph.add_edge(src, dest, graph.euclide_distance(src, dest))
     file.close()
@@ -257,11 +327,11 @@ def read_file(filename):
 def main(folder):
     with os.scandir(folder) as it:
         for i, entry in enumerate(it):
-            if "ulysses16" in entry.name:
+            if "burma14" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
                 d_dist = {}
                 p_dist = {}
-                nodes = graph.get_graph()
+                nodes = graph.get_nodes()
                 dist = held_karp(nodes[0], nodes[0], nodes, d_dist, p_dist)
                 print(str(dist))
 

@@ -168,7 +168,7 @@ class Node():
     def latitude_rad(self):
         deg = math.trunc(self._latitude)
         rounded = self._latitude - deg
-        return PI * ((deg + 5.0 * rounded) / 3.0) / 180.0
+        return PI * (deg + 5.0 * (rounded / 3.0)) / 180.0
 
     def set_latitude(self, latitude):
         self._latitude = latitude
@@ -179,7 +179,7 @@ class Node():
     def longitude_rad(self):
         deg = math.trunc(self._longitude)
         rounded = self._longitude - deg
-        return PI * ((deg + 5.0 * rounded) / 3.0) / 180.0
+        return PI * (deg + 5.0 * (rounded / 3.0)) / 180.0
 
     def set_longitude(self, longitude):
         self._longitude = longitude
@@ -350,7 +350,6 @@ def main(folder):
                 preordered = approx_t_tsp(graph, 0)
                 weight = 0
                 for node in preordered:
-                    print(str(node.key()))
                     weight += node.key()
                 print(weight)
                 break
