@@ -340,31 +340,36 @@ def read_file(filename):
     file.close()
     return graph
 
+def errore(soluzione, ottimo):
+    return str((soluzione-ottimo)/ottimo)
 
 def main(folder):
+    ottimi_file = open(folder+"/"+"ottimi.txt", "r")
+    ottimi = {}
+    for line in ottimi_file:
+        graph, ottimo = list(line.split(":"))
+        ottimi[graph] = int(ottimo)
+    ottimi_file.close()
     with os.scandir(folder) as it:
         for i, entry in enumerate(it):
-            graph = read_file(folder+"/"+entry.name)
-            #start = time.time()
-            preordered = approx_t_tsp(graph, 0)
-            weight = 0
-            for node in preordered:
-                weight += node.key()
-            """time_exec = time.time() - start
-            test = entry.name.replace("input_random","output_random")
-            with open(folder+"/"+test) as f:
-                result = int(f.read().split()[0])
-                if weight != result:
-                    print("Our result: "+str(weight))
-                    print("Correct: "+str(result))
-                    print("Graph: "+str(entry.name))
-                else:
-                    result_time = open(folder+"/"+test+"_time", "a")
-                    result_time.write("\nPrim: "+str(time_exec))
-                    result_time.close()"""
+            if ".tsp" in entry.name:
+                ottimo = ottimi[entry.name]
+                graph = read_file(folder+"/"+entry.name)
+                start = time.time()
+                preordered = approx_t_tsp(graph, 0)
+                weight = 0
+                for node in preordered:
+                    weight += node.key()
+                time_exec = time.time() - start
+                test = entry.name.replace(".tsp", ".out")
+                result = open(folder+"/"+test, "a")
+                result.write("\nHeld Karp - soluzione: " +
+                             str(weight)+" tempo: "+str(time_exec) + " errore: "+errore(weight, ottimo)+" %")
+                result.close()
 
 
 if __name__ == "__main__":
+    sys.setrecursionlimit(999999999)
     main("tsp_dataset")
 
 # %%
