@@ -359,11 +359,11 @@ def main(folder):
                 preordered = approx_t_tsp(graph, 0)
                 weight = 0
                 for node in preordered:
-                    weight += node.key()
+                    weight += 2 * node.key()
                 time_exec = time.time() - start
                 test = entry.name.replace(".tsp", ".out")
                 result = open(folder+"/"+test, "a")
-                result.write("\nHeld Karp - soluzione: " +
+                result.write("\n2attsp - soluzione: " +
                              str(weight)+" tempo: "+str(time_exec) + " errore: "+errore(weight, ottimo)+" %")
                 result.close()
 
