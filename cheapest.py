@@ -61,7 +61,8 @@ class Node():
         self._edges.append(edge)
 
     def remove_edge(self, edge):
-        del self._edges[-1]
+        if edge in self._edges:
+            self._edges.remove(edge)
 
     def latitude(self):
         return self._latitude
@@ -85,11 +86,13 @@ class Node():
     def set_longitude(self, longitude):
         self._longitude = longitude
 
+    """
     def find_edge(self, dest):
         for i, val in enumerate(self._edges):
             if val.opposite(self) == dest:
                 return val
         return None
+    """ 
 
 
 class Edge():
@@ -205,9 +208,23 @@ class Graph():
         return len(self._nodes)
 
     def remove_edge(self, edge):
-        self._edges.pop()
-        self._nodes[edge._nodes[0]._name].remove_edge(edge)
-        self._nodes[edge._nodes[1]._name].remove_edge(edge)
+        self._edges.remove(edge)
+        self._nodes[edge.nodes()[0].name()].remove_edge(edge)
+        self._nodes[edge.nodes()[1].name()].remove_edge(edge)
+
+    def remove_node(self, node):
+        for i, val in enumerate(self._nodes[node.name()].edges()):
+            self.remove_edge(val)
+        self._nodes.remove(node)
+    
+    def find_edge(self, node1, node2) -> Edge:
+        for i, val in enumerate(self._edges):
+            val_nodes = val.nodes()
+            if (val_nodes[0] == node1 and val_nodes[1] == node2) \
+                or (val_nodes[0] == node2 and val_nodes[1] == node1):
+                return val
+        return None
+
 
     def _merge(self, left, middle, right):
         dim_left = middle - left + 1
@@ -265,50 +282,50 @@ class Graph():
         y = abs(src.longitude() - dest.longitude())
         return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
 
-
-
 def cheapest_insertion(G:Graph):
-    edges = list(G.edges())
+    edges = G.edges()
     nodes = list(G.nodes())
-    nodes_sol = list()
     edges_sol = list()
-    nodes_sol.append(nodes[0])
-    nodes.pop(0)
     weight_sol = 0
-
+    zero_n = nodes.pop(0)
+    
     while len(nodes) != 0:
         local_min = float("inf")
+        local_edge = [None]*3
         local_node = None
-        local_edge = None
-        for i in range(len(nodes)):
 
-            if len(nodes_sol) == 1:
-                val = nodes_sol[0].find_edge(nodes[i])
+        if len(edges_sol) == 0:
+            for i in range(len(nodes)):
+                val = G.find_edge(zero_n, nodes[i])
                 if val.weight() < local_min:
                     local_min = val.weight()
                     local_node = nodes[i]
-                    local_edge = val
-            else:
-                for k in range(len(nodes)):
-                    for idx, val in enumerate(edges):
-                        ik = nodes[k].find_edge(val.nodes()[0])
-                        jk = nodes[k].find_edge(val.nodes()[1])
-                        ij = val.nodes()[0].find_edge(val.nodes()[1])
-                        if ik != None and jk != None and ij != None:
-                            to_minimized = ik.weight() + jk.weight() - ij.weight()
-                            if to_minimized < local_min:
-                                local_min = to_minimized
-                                local_node = nodes[k]
-                                local_edge = val
-                
-        nodes_sol.append(local_node)
+                    local_edge[0] = val
+        else:
+            for k in range(len(nodes)):
+                for idx, val in enumerate(edges_sol):
+                    ik = G.find_edge(nodes[k], val.nodes()[0])
+                    jk = G.find_edge(nodes[k], val.nodes()[1])
+                    ij = val
+                    if ik != None and jk != None and ij != None:
+                        to_minimized = ik.weight() + jk.weight() - ij.weight()
+                        if to_minimized < local_min:
+                            local_min = to_minimized
+                            local_node = nodes[k]
+                            local_edge = ik, jk, val
+
+
         nodes.remove(local_node)
-        edges_sol.append(local_edge)
-        edges.remove(local_edge)
-        weight_sol += local_edge.weight()
+        if not local_edge[1]:
+            weight_sol += local_min
+            edges_sol.append(local_edge[0])
+        else:
+            weight_sol += local_edge[0].weight() + local_edge[1].weight() - local_edge[2].weight()
+            edges_sol.append(local_edge[0])
+            edges_sol.append(local_edge[1])
+            edges_sol.remove(local_edge[2])
 
     return weight_sol
-        
 
 def read_file(filename):
     file = open(filename, "r")
@@ -362,23 +379,19 @@ def main(folder, timeout):
     ottimi_file.close()
     with os.scandir(folder) as it:
         for i, entry in enumerate(it):
-            if "ulysses16.tsp" in entry.name:
-                graph = read_file(folder+"/"+entry.name)
-                sol = cheapest_insertion(graph)
-                print(sol)
-            """
             if ".tsp" in entry.name:
+                print(entry.name)
                 ottimo = ottimi[entry.name]
                 graph = read_file(folder+"/"+entry.name)
                 d_dist = {}
                 p_dist = {}
-                nodes = graph.get_nodes()
+                nodes = graph.nodes()
                 global stop
                 stop = False
                 t = Timer(timeout, timeover)
                 t.start()
                 start = time.time()
-                dist = held_karp(nodes[0], nodes[0], nodes, d_dist, p_dist)
+                dist = cheapest_insertion(graph)
                 time_exec = time.time() - start
                 t.cancel()
                 test = entry.name.replace(".tsp", ".out")
@@ -386,7 +399,7 @@ def main(folder, timeout):
                 result.write("\nHeld Karp - soluzione: " +
                              str(dist)+" tempo: "+str(time_exec) + " errore: "+errore(dist, ottimo)+" %")
                 result.close()
-            """
+            
 
 
 if __name__ == "__main__":
