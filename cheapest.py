@@ -317,7 +317,7 @@ def cheapest_insertion(G:Graph):
 
         nodes.remove(local_node)
         if not local_edge[1]:
-            weight_sol += local_min
+            weight_sol += local_min*2
             edges_sol.append(local_edge[0])
         else:
             weight_sol += local_edge[0].weight() + local_edge[1].weight() - local_edge[2].weight()
@@ -395,8 +395,8 @@ def main(folder, timeout):
                 time_exec = time.time() - start
                 t.cancel()
                 test = entry.name.replace(".tsp", ".out")
-                result = open(folder+"/"+test, "w")
-                result.write("\nHeld Karp - soluzione: " +
+                result = open(folder+"/"+test, "a")
+                result.write("\nCheapest_Insertion - soluzione: " +
                              str(dist)+" tempo: "+str(time_exec) + " errore: "+errore(dist, ottimo)+" %")
                 result.close()
             
