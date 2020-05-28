@@ -1,0 +1,57 @@
+\chapter{Introduzione\label{sec:introduzione}}
+\noindent La relazione descrive gli algoritmi implementati da Alessio Lazzaron e Matteo Marchiori per il secondo laboratorio del corso di algoritmi avanzati.
+
+\section{Descrizione degli algoritmi\label{sec:descrizione}}
+Gli algoritmi implementati sono:
+\begin{itemize}
+    \item Held Karp;
+    \item Algoritmo 2-approssimato, con MST costruito usando l'algoritmo di Prim;
+    \item Euristica costruttiva Cheapest Insertion.
+\end{itemize}
+
+In seguito riportiamo lo pseudocodice degli algoritmi, e la parte saliente del codice implementato in Python in modo da confrontarli facilmente.
+
+\subsection{Algoritmo di Held Karp\label{sec:hp}}
+\begin{verbatim}
+    
+\end{verbatim}
+
+\begin{minted}{python}
+    
+\end{minted}
+
+Per tenere memoria delle distanze minime e dei nodi predecessori abbiamo utilizzato dizionari di python, in modo da mantenere l'indicizzazione attraverso nodo destinazione , lista dei nodi coperti vista a lezione.
+Avendo l'algoritmo una complessità O(\(2^{n}\)) è stata inserito un meccanismo per fermare il calcolo dopo un numero di secondi specificabile non noto a priori.
+
+\clearpage
+
+\subsection{Algoritmo 2-approssimato\label{sec:a2a}}
+\begin{verbatim}
+    
+\end{verbatim}    
+
+\begin{minted}{python}
+    
+\end{minted}
+
+In questo algoritmo costruiamo una lista dei nodi di un MST trovato usando Prim in ordine prefisso, aggiungendo al termine della lista il nodo radice.
+Funziona perché vale la disuguaglianza triangolare, ovvero per arrivare da un nodo sorgente a un nodo destinazione la soluzione migliore include l'arco che li collega direttamente.
+Osservando la soluzione peggiore di TSP trovata con l'algoritmo, si vede che non può essere peggiore rispetto a prendere 2 volte la soluzione ottima.
+Quindi l'algoritmo di 2-approssimazione è corretto.
+
+\clearpage
+
+\subsection{Algoritmo Cheapest Insertion\label{sec:ci}}
+\begin{verbatim}
+    
+\end{verbatim}
+
+\begin{minted}{python}
+    
+\end{minted}
+
+Questo algoritmo di euristica costruttiva parte da un nodo radice, sceglie un arco e il nodo destinazione.
+Dopodiché viene preso ogni volta un nodo non presente nella soluzione e l'arco per collegarlo, partendo dall'ultimo nodo incluso nella soluzione, in modo che l'ultimo nodo aggiunto minimizzi il costo complessivo della soluzione trovata.
+
+\subsection{Scelte implementative comuni\label{sec:comuni}}
+Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.
