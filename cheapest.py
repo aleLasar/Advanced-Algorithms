@@ -86,13 +86,6 @@ class Node():
     def set_longitude(self, longitude):
         self._longitude = longitude
 
-    """
-    def find_edge(self, dest):
-        for i, val in enumerate(self._edges):
-            if val.opposite(self) == dest:
-                return val
-        return None
-    """ 
 
 
 class Edge():
@@ -211,11 +204,6 @@ class Graph():
         self._edges.remove(edge)
         self._nodes[edge.nodes()[0].name()].remove_edge(edge)
         self._nodes[edge.nodes()[1].name()].remove_edge(edge)
-
-    def remove_node(self, node):
-        for i, val in enumerate(self._nodes[node.name()].edges()):
-            self.remove_edge(val)
-        self._nodes.remove(node)
     
     def find_edge(self, node1, node2) -> Edge:
         for i, val in enumerate(self._edges):
@@ -283,6 +271,7 @@ class Graph():
         return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
 
 def cheapest_insertion(G:Graph):
+    visited_edge = dict()
     edges = G.edges()
     nodes = list(G.nodes())
     edges_sol = list()
@@ -304,9 +293,19 @@ def cheapest_insertion(G:Graph):
         else:
             for k in range(len(nodes)):
                 for idx, val in enumerate(edges_sol):
-                    ik = G.find_edge(nodes[k], val.nodes()[0])
-                    jk = G.find_edge(nodes[k], val.nodes()[1])
+                    ik, jk, ij = [None]*3
+                    if (nodes[k].name(), val.nodes()[0].name()) in visited_edge:
+                        ik = visited_edge[(nodes[k].name(), val.nodes()[0].name())]
+                    else:
+                        ik = G.find_edge(nodes[k], val.nodes()[0])
+                    
+                    if ((nodes[k].name(), val.nodes()[1].name())) in visited_edge:
+                        jk = visited_edge[(nodes[k].name(), val.nodes()[1].name())]
+                    else:
+                        jk = G.find_edge(nodes[k], val.nodes()[1])
+                    
                     ij = val
+
                     if ik != None and jk != None and ij != None:
                         to_minimized = ik.weight() + jk.weight() - ij.weight()
                         if to_minimized < local_min:
