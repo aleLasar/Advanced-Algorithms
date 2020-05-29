@@ -152,7 +152,7 @@ class UnionFind():
 class Graph():
 
     def __init__(self, n):
-        self._matrix = [[None] * n] * n
+        self._edge = dict()
         self._nodes = [None] * n
 
     def add_node(self, name, latitude, longitude):
@@ -165,11 +165,11 @@ class Graph():
 
     def add_edge(self, src, dest, weight):
         edge = Edge(src, dest, weight)
-        self._matrix[src.name()][dest.name()] = edge
-        self._matrix[dest.name()][src.name()] = edge
+        self._edge[src.name(), dest.name()] = edge
+        self._edge[dest.name(), src.name()] = edge
 
-    def matrix(self):
-        return self._matrix
+    def edges(self):
+        return self._edge
 
     def nodes(self):
         return self._nodes
@@ -184,8 +184,8 @@ class Graph():
         return len(self._nodes)
 
     def remove_edge(self, edge):
-        self._matrix[edge.nodes()[0].name()][edge.nodes()[1].name()] = None
-        self._matrix[edge.nodes()[1].name()][edge.nodes()[0].name()] = None
+        self._edge[edge.nodes()[0].name()][edge.nodes()[1].name()] = None
+        self._edge[edge.nodes()[1].name()][edge.nodes()[0].name()] = None
 
     def geo_distance(self, src, dest):
         q1 = math.cos(src.longitude_rad() - dest.longitude_rad())
@@ -198,7 +198,7 @@ class Graph():
         y = abs(src.longitude() - dest.longitude())
         return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
 
-
+"""
 def cheapest_insertion(G: Graph):
     visited_edge = {}
     matrix = G.matrix()
@@ -255,6 +255,54 @@ def cheapest_insertion(G: Graph):
         edges_sol.remove(local_edge[2])
 
     return weight_sol
+"""
+
+def cheapest_insertion(G:Graph):
+    edges = G.edges()
+    nodes = list(G.nodes())
+    edges_sol = dict()
+    weight_sol = 0
+    zero_n = nodes.pop(0)
+    
+    while len(nodes) != 0:
+        local_min = float("inf")
+        local_edge = [None]*3
+        local_node = None
+        if len(edges_sol) == 0:
+            for i in range(len(nodes)):
+                val = edges[zero_n.name(), nodes[i].name()]
+                if val.weight() < local_min:
+                    local_min = val.weight()
+                    local_node = nodes[i]
+                    local_edge[0] = val
+        else:
+            for k in range(len(nodes)):
+                for idx, val in enumerate(edges_sol.values()):
+                    ik = edges[nodes[k].name(), val.nodes()[0].name()]
+                    jk = edges[nodes[k].name(), val.nodes()[1].name()]
+                    ij = val
+
+                    to_minimized = ik.weight() + jk.weight() - ij.weight()
+                    if to_minimized < local_min:
+                        local_min = to_minimized
+                        local_node = nodes[k]
+                        local_edge = ik, jk, val
+
+        nodes.remove(local_node)
+        if not local_edge[1]:
+            weight_sol += local_min*2
+            nodes_e = local_edge[0].nodes()
+            edges_sol[nodes_e[0].name(), nodes_e[1].name()] = local_edge[0]
+        else:
+            weight_sol += local_edge[0].weight() + local_edge[1].weight() - local_edge[2].weight()
+            nodes_0 = local_edge[0].nodes()
+            nodes_1 = local_edge[1].nodes()
+            nodes_2 = local_edge[2].nodes()
+            edges_sol[nodes_0[0].name(), nodes_0[1].name()] = local_edge[0]
+            edges_sol[nodes_1[0].name(), nodes_1[1].name()] = local_edge[1]
+            del edges_sol[nodes_2[0].name(), nodes_2[1].name()]
+
+    return weight_sol
 
 
 def read_file(filename):
@@ -309,9 +357,10 @@ def main(folder):
     ottimi_file.close()
     with os.scandir(folder) as it:
         for i, entry in enumerate(it):
-            if "berlin52.tsp" in entry.name:
+            if "tsp" in entry.name:
                 ottimo = ottimi[entry.name]
                 graph = read_file(folder+"/"+entry.name)
+                print(entry.name)
                 start = time.time()
                 dist = cheapest_insertion(graph)
                 time_exec = time.time() - start
