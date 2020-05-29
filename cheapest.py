@@ -6,18 +6,13 @@ import time
 
 PI = 3.141592
 RRR = 6378.388
-stop = False
 
-def timeover():
-    global stop
-    stop = True
 
 class Node():
 
     def __init__(self, name, latitude, longitude):
         self._name = name
         self._visited = False
-        self._edges = []
         self._latitude = latitude
         self._longitude = longitude
 
@@ -54,16 +49,6 @@ class Node():
     def set_visited(self, visited):
         self._visited = visited
 
-    def edges(self):
-        return self._edges
-
-    def add_edge(self, edge):
-        self._edges.append(edge)
-
-    def remove_edge(self, edge):
-        if edge in self._edges:
-            self._edges.remove(edge)
-
     def latitude(self):
         return self._latitude
 
@@ -85,7 +70,6 @@ class Node():
 
     def set_longitude(self, longitude):
         self._longitude = longitude
-
 
 
 class Edge():
@@ -168,8 +152,8 @@ class UnionFind():
 class Graph():
 
     def __init__(self, n):
+        self._matrix = [[None] * n] * n
         self._nodes = [None] * n
-        self._edges = []
 
     def add_node(self, name, latitude, longitude):
         if not self.is_node_present(name):
@@ -181,12 +165,11 @@ class Graph():
 
     def add_edge(self, src, dest, weight):
         edge = Edge(src, dest, weight)
-        self._edges.append(edge)
-        self._nodes[src.name()].add_edge(edge)
-        self._nodes[dest.name()].add_edge(edge)
+        self._matrix[src.name()][dest.name()] = edge
+        self._matrix[dest.name()][src.name()] = edge
 
-    def edges(self):
-        return self._edges
+    def matrix(self):
+        return self._matrix
 
     def nodes(self):
         return self._nodes
@@ -201,63 +184,8 @@ class Graph():
         return len(self._nodes)
 
     def remove_edge(self, edge):
-        self._edges.remove(edge)
-        self._nodes[edge.nodes()[0].name()].remove_edge(edge)
-        self._nodes[edge.nodes()[1].name()].remove_edge(edge)
-    
-    def find_edge(self, node1, node2) -> Edge:
-        for i, val in enumerate(self._edges):
-            val_nodes = val.nodes()
-            if (val_nodes[0] == node1 and val_nodes[1] == node2) \
-                or (val_nodes[0] == node2 and val_nodes[1] == node1):
-                return val
-        return None
-
-
-    def _merge(self, left, middle, right):
-        dim_left = middle - left + 1
-        dim_right = right - middle
-        left_array = [0] * dim_left
-        right_array = [0] * dim_right
-
-        for i in range(0, dim_left):
-            left_array[i] = self._edges[left + i]
-
-        for j in range(0, dim_right):
-            right_array[j] = self._edges[middle + 1 + j]
-
-        i = 0
-        j = 0
-        k = left
-
-        while i < dim_left and j < dim_right:
-            if left_array[i] <= right_array[j]:
-                self._edges[k] = left_array[i]
-                i += 1
-            else:
-                self._edges[k] = right_array[j]
-                j += 1
-            k += 1
-
-        while i < dim_left:
-            self._edges[k] = left_array[i]
-            i += 1
-            k += 1
-
-        while j < dim_right:
-            self._edges[k] = right_array[j]
-            j += 1
-            k += 1
-
-    def _mergeSort(self, left, right):
-        if left < right:
-            middle = (left + (right-1)) // 2
-            self._mergeSort(left, middle)
-            self._mergeSort(middle + 1, right)
-            self._merge(left, middle, right)
-
-    def ordinaLati(self):
-        self._mergeSort(0, len(self._edges)-1)
+        self._matrix[edge.nodes()[0].name()][edge.nodes()[1].name()] = None
+        self._matrix[edge.nodes()[1].name()][edge.nodes()[0].name()] = None
 
     def geo_distance(self, src, dest):
         q1 = math.cos(src.longitude_rad() - dest.longitude_rad())
@@ -270,61 +198,64 @@ class Graph():
         y = abs(src.longitude() - dest.longitude())
         return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
 
-def cheapest_insertion(G:Graph):
-    visited_edge = dict()
-    edges = G.edges()
+
+def cheapest_insertion(G: Graph):
+    visited_edge = {}
+    matrix = G.matrix()
     nodes = list(G.nodes())
     edges_sol = list()
     weight_sol = 0
     zero_n = nodes.pop(0)
-    
+    local_min = float("inf")
+    local_edge = [None]*3
+    local_node = None
+
+    for opposite, edge in enumerate(matrix[zero_n.name()]):        
+        if edge.weight() < local_min:
+            local_min = edge.weight()
+            local_node = nodes[opposite]
+            local_edge[0] = edge
+
+    nodes.remove(local_node)
+    weight_sol += local_min * 2
+    edges_sol.append(local_edge[0])
+
     while len(nodes) != 0:
         local_min = float("inf")
         local_edge = [None]*3
         local_node = None
 
-        if len(edges_sol) == 0:
-            for i in range(len(nodes)):
-                val = G.find_edge(zero_n, nodes[i])
-                if val.weight() < local_min:
-                    local_min = val.weight()
-                    local_node = nodes[i]
-                    local_edge[0] = val
-        else:
-            for k in range(len(nodes)):
-                for idx, val in enumerate(edges_sol):
-                    ik, jk, ij = [None]*3
-                    if (nodes[k].name(), val.nodes()[0].name()) in visited_edge:
-                        ik = visited_edge[(nodes[k].name(), val.nodes()[0].name())]
-                    else:
-                        ik = G.find_edge(nodes[k], val.nodes()[0])
-                    
-                    if ((nodes[k].name(), val.nodes()[1].name())) in visited_edge:
-                        jk = visited_edge[(nodes[k].name(), val.nodes()[1].name())]
-                    else:
-                        jk = G.find_edge(nodes[k], val.nodes()[1])
-                    
-                    ij = val
+        for k in range(len(nodes)):
+            for idx, val in enumerate(edges_sol):
+                ik, jk, ij = [None]*3
+                if (nodes[k].name(), val.nodes()[0].name()) in visited_edge:
+                    ik = visited_edge[(nodes[k].name(), val.nodes()[0].name())]
+                else:
+                    ik = matrix[nodes[k].name()][val.nodes()[0].name()]
 
-                    if ik != None and jk != None and ij != None:
-                        to_minimized = ik.weight() + jk.weight() - ij.weight()
-                        if to_minimized < local_min:
-                            local_min = to_minimized
-                            local_node = nodes[k]
-                            local_edge = ik, jk, val
+                if ((nodes[k].name(), val.nodes()[1].name())) in visited_edge:
+                    jk = visited_edge[(nodes[k].name(), val.nodes()[1].name())]
+                else:
+                    jk = matrix[nodes[k].name()][val.nodes()[1].name()]
 
+                ij = val
+
+                if ik != None and jk != None and ij != None:
+                    to_minimized = ik.weight() + jk.weight() - ij.weight()
+                    if to_minimized < local_min:
+                        local_min = to_minimized
+                        local_node = nodes[k]
+                        local_edge = ik, jk, val
 
         nodes.remove(local_node)
-        if not local_edge[1]:
-            weight_sol += local_min*2
-            edges_sol.append(local_edge[0])
-        else:
-            weight_sol += local_edge[0].weight() + local_edge[1].weight() - local_edge[2].weight()
-            edges_sol.append(local_edge[0])
-            edges_sol.append(local_edge[1])
-            edges_sol.remove(local_edge[2])
+        weight_sol += local_edge[0].weight() + \
+            local_edge[1].weight() - local_edge[2].weight()
+        edges_sol.append(local_edge[0])
+        edges_sol.append(local_edge[1])
+        edges_sol.remove(local_edge[2])
 
     return weight_sol
+
 
 def read_file(filename):
     file = open(filename, "r")
@@ -369,7 +300,7 @@ def errore(soluzione, ottimo):
     return str((soluzione-ottimo)/ottimo)
 
 
-def main(folder, timeout):
+def main(folder):
     ottimi_file = open(folder+"/"+"ottimi.txt", "r")
     ottimi = {}
     for line in ottimi_file:
@@ -378,31 +309,20 @@ def main(folder, timeout):
     ottimi_file.close()
     with os.scandir(folder) as it:
         for i, entry in enumerate(it):
-            if ".tsp" in entry.name:
-                print(entry.name)
+            if "berlin52.tsp" in entry.name:
                 ottimo = ottimi[entry.name]
                 graph = read_file(folder+"/"+entry.name)
-                d_dist = {}
-                p_dist = {}
-                nodes = graph.nodes()
-                global stop
-                stop = False
-                t = Timer(timeout, timeover)
-                t.start()
                 start = time.time()
                 dist = cheapest_insertion(graph)
                 time_exec = time.time() - start
-                t.cancel()
                 test = entry.name.replace(".tsp", ".out")
                 result = open(folder+"/"+test, "a")
                 result.write("\nCheapest_Insertion - soluzione: " +
                              str(dist)+" tempo: "+str(time_exec) + " errore: "+errore(dist, ottimo)+" %")
                 result.close()
-            
 
 
 if __name__ == "__main__":
     sys.setrecursionlimit(999999999)
     #main("tsp_dataset", int(sys.argv[0]))
-    main("tsp_dataset", 20)
-
+    main("tsp_dataset")
