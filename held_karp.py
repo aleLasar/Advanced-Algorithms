@@ -140,29 +140,6 @@ class Edge():
 
 
 # %%
-class UnionFind():
-
-    def __init__(self, n):
-        self._parents = [None] * n
-        for i in range(0, n):
-            self._parents[i] = i
-
-    def find(self, x, depth=0):
-        if (x != self._parents[x]):
-            return self.find(self._parents[x], depth+1)
-        return x, depth
-
-    def union(self, x, y):
-        set_x, depth_x = self.find(x)
-        set_y, depth_y = self.find(y)
-        if(set_x == set_y):
-            return
-        if(depth_x > depth_y):
-            self._parents[set_y] = set_x
-        else:
-            self._parents[set_x] = set_y
-
-# %%
 
 
 class Graph():
@@ -204,51 +181,6 @@ class Graph():
         self._edges.pop()
         self._nodes[edge._nodes[0]._name].remove_edge(edge)
         self._nodes[edge._nodes[1]._name].remove_edge(edge)
-
-    def _merge(self, left, middle, right):
-        dim_left = middle - left + 1
-        dim_right = right - middle
-        left_array = [0] * dim_left
-        right_array = [0] * dim_right
-
-        for i in range(0, dim_left):
-            left_array[i] = self._edges[left + i]
-
-        for j in range(0, dim_right):
-            right_array[j] = self._edges[middle + 1 + j]
-
-        i = 0
-        j = 0
-        k = left
-
-        while i < dim_left and j < dim_right:
-            if left_array[i] <= right_array[j]:
-                self._edges[k] = left_array[i]
-                i += 1
-            else:
-                self._edges[k] = right_array[j]
-                j += 1
-            k += 1
-
-        while i < dim_left:
-            self._edges[k] = left_array[i]
-            i += 1
-            k += 1
-
-        while j < dim_right:
-            self._edges[k] = right_array[j]
-            j += 1
-            k += 1
-
-    def _mergeSort(self, left, right):
-        if left < right:
-            middle = (left + (right-1)) // 2
-            self._mergeSort(left, middle)
-            self._mergeSort(middle + 1, right)
-            self._merge(left, middle, right)
-
-    def ordinaLati(self):
-        self._mergeSort(0, len(self._edges)-1)
 
     def geo_distance(self, src, dest):
         q1 = math.cos(src.longitude_rad() - dest.longitude_rad())
@@ -361,7 +293,7 @@ def main(folder, timeout):
                 time_exec = time.time() - start
                 t.cancel()
                 test = entry.name.replace(".tsp", ".out")
-                result = open(folder+"/"+test, "w")
+                result = open(folder+"/"+test, "a")
                 result.write("\nHeld Karp - soluzione: " +
                              str(dist)+" tempo: "+str(time_exec) + " errore: "+errore(dist, ottimo)+" %")
                 result.close()

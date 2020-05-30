@@ -124,29 +124,6 @@ class Edge():
 
 
 # %%
-class UnionFind():
-
-    def __init__(self, n):
-        self._parents = [None] * n
-        for i in range(0, n):
-            self._parents[i] = i
-
-    def find(self, x, depth=0):
-        if (x != self._parents[x]):
-            return self.find(self._parents[x], depth+1)
-        return x, depth
-
-    def union(self, x, y):
-        set_x, depth_x = self.find(x)
-        set_y, depth_y = self.find(y)
-        if(set_x == set_y):
-            return
-        if(depth_x > depth_y):
-            self._parents[set_y] = set_x
-        else:
-            self._parents[set_x] = set_y
-
-# %%
 
 
 class Graph():
@@ -198,69 +175,10 @@ class Graph():
         y = abs(src.longitude() - dest.longitude())
         return int(math.sqrt(math.pow(x, 2)+math.pow(y, 2)))
 
-"""
-def cheapest_insertion(G: Graph):
-    visited_edge = {}
-    matrix = G.matrix()
-    nodes = list(G.nodes())
-    edges_sol = list()
-    weight_sol = 0
-    zero_n = nodes.pop(0)
-    local_min = float("inf")
-    local_edge = [None]*3
-    local_node = None
-
-    for opposite, edge in enumerate(matrix[zero_n.name()]):        
-        if edge.weight() < local_min:
-            local_min = edge.weight()
-            local_node = nodes[opposite]
-            local_edge[0] = edge
-
-    nodes.remove(local_node)
-    weight_sol += local_min * 2
-    edges_sol.append(local_edge[0])
-
-    while len(nodes) != 0:
-        local_min = float("inf")
-        local_edge = [None]*3
-        local_node = None
-
-        for k in range(len(nodes)):
-            for idx, val in enumerate(edges_sol):
-                ik, jk, ij = [None]*3
-                if (nodes[k].name(), val.nodes()[0].name()) in visited_edge:
-                    ik = visited_edge[(nodes[k].name(), val.nodes()[0].name())]
-                else:
-                    ik = matrix[nodes[k].name()][val.nodes()[0].name()]
-
-                if ((nodes[k].name(), val.nodes()[1].name())) in visited_edge:
-                    jk = visited_edge[(nodes[k].name(), val.nodes()[1].name())]
-                else:
-                    jk = matrix[nodes[k].name()][val.nodes()[1].name()]
-
-                ij = val
-
-                if ik != None and jk != None and ij != None:
-                    to_minimized = ik.weight() + jk.weight() - ij.weight()
-                    if to_minimized < local_min:
-                        local_min = to_minimized
-                        local_node = nodes[k]
-                        local_edge = ik, jk, val
-
-        nodes.remove(local_node)
-        weight_sol += local_edge[0].weight() + \
-            local_edge[1].weight() - local_edge[2].weight()
-        edges_sol.append(local_edge[0])
-        edges_sol.append(local_edge[1])
-        edges_sol.remove(local_edge[2])
-
-    return weight_sol
-"""
-
 def cheapest_insertion(G:Graph):
     edges = G.edges()
     nodes = list(G.nodes())
-    edges_sol = dict()
+    edges_sol = {}
     weight_sol = 0
     zero_n = nodes.pop(0)
     
@@ -373,5 +291,4 @@ def main(folder):
 
 if __name__ == "__main__":
     sys.setrecursionlimit(999999999)
-    #main("tsp_dataset", int(sys.argv[0]))
     main("tsp_dataset")
