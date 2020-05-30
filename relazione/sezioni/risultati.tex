@@ -1,32 +1,43 @@
-\chapter{Diagrammi e risultati\label{sec:risultati}}
-\noindent In questa sezione vengono mostrati i diagrammi che illustrano i risultati ottenuti dai tre algoritmi implementati in termini di tempo a fronte della taglia del grafo.
+\chapter{Risultati\label{sec:risultati}}
+\noindent In questa sezione mostriamo i risultati ottenuti dai tre algoritmi, in termini di tempo impiegato, soluzione ed errore commesso rispetto all'ottimo.
 
-\section{Diagrammi\label{sec:diagrammi}}
+\section{Tabella\label{sec:tabella}}
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=\textwidth]{immagini/prim.pdf}
-    \caption{Diagramma con tempi impiegati per Prim}
-    \label{fig:diagramma-prim}
-\end{figure}
+\footnotesize
+\begin{tabularx}{\textwidth}{*{10}{Y}}
+    \toprule
+    \multirow{2}{*}{\textbf{Istanza}} & \multicolumn{3}{c}{\textbf{Held-Karp}} & \multicolumn{3}{c}{\textbf{Cheapest Insertion}} & \multicolumn{3}{c}{\textbf{2-approssimato}}\\
+    & Sol & Tempo (s) & Errore & Sol & Tempo (s) & Errore & Sol & Tempo (s) & Errore\\
+    \endfirsthead
+    \toprule
+    \multirow{2}{*}{\textbf{Istanza}} & \multicolumn{3}{c}{\textbf{Held-Karp}} & \multicolumn{3}{c}{\textbf{Cheapest Insertion}} & \multicolumn{3}{c}{\textbf{2-approssimato}}\\
+    & Sol & Tempo (s) & Errore & Sol & Tempo (s) & Errore & Sol & Tempo (s) & Errore\\
+    \endhead
+    \midrule
+    berlin52 & $18904$ & $180.00$ & $150.6$\% & $8988$ & $0.05$ & $19.17$\% & $12132$ & $0.003$ & $60.86$\%\\
+    burma14 & $3323$ & $6.01$ & - & $3568$ & $0.001$ & $7.373$\% & $4690$ & $0.0005$ & $41.14$\%\\
+    ch150 & $49470$ & $180.03$ & $657.8$\% & $7876$ & $1.43$ & $20.65$\% & $11640$ & $0.02$ & $78.31$\%\\
+    d493 & $112243$ & $180.28$ & $220.7$\% & $39760$ & $57.54$ & $13.59$\% & $58166$ & $0.28$ & $66.18$\%\\
+    dsj1000 & $555572539$ & $181.20$ & $2800$\% & $22290672$ & $526.06$ & $19.46$\% & $31809536$ & $1.01$ & $70.47$\%\\
+    eil51 & $1093$ & $180.00$ & $156.6$\% & $474$ & $0.05$ & $11.27$\% & $718$ & $0.003$ & $68.54$\%\\
+    gr202 & $56641$ & $180.05$ & $41.03$\% & $46480$ & $3.91$ & $15.73$\% & $65246$ & $0.04$ & $62.46$\%\\
+    gr229 & $176922$ & $180.06$ & $31.44$\% & $154038$ & $5.42$ & $14.44$\% & $227954$ & $0.06$ & $69.35$\%\\
+    kroA100 & $175122$ & $180.02$ & $722.9$\% & $24175$ & $0.40$ & $13.59$\% & $37462$ & $0.01$ & $76.03$\%\\
+    kroD100 & $152902$ & $180.02$ & $618.1$\% & $25155$ & $0.42$ & $18.13$\% & $37104$ & $0.01$ & $74.25$\%\\
+    pcb442 & $215368$ & $180.23$ & $324.1$\% & $60766$ & $41.31$ & $19.67$\% & $92636$ & $0.20$ & $82.43$\%\\
+    ulysses16 & $6859$ & $35.65$ & - & $7368$ & $0.001$ & $7.420$\% & $9080$ & $0.0004$ & $32.38$\%\\
+    ulysses22 & $8649$ & $180.01$ & $23.33$\% & $7845$ & $0.004$ & $11.86$\% & $9320$ & $0.0008$ & $32.90$\%\\
+    \bottomrule
+    \caption{Risultati}\label{tab:risultati}
+\end{tabularx}
 
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=\textwidth]{immagini/naive.pdf}
-    \caption{Diagramma con tempi impiegati per Kruskal-naive}
-    \label{fig:diagramma-naive}
-\end{figure}
-
-\begin{figure}[htp]
-    \centering
-    \includegraphics[width=\textwidth]{immagini/kruskal.pdf}
-    \caption{Diagramma con tempi impiegati per Kruskal}
-    \label{fig:diagramma-kruskal}
-\end{figure}
+\normalsize
 
 \clearpage
 
 \section{Risultati\label{sec:risultati}}
-È chiaramente visibile dai diagrammi che rappresentano le tempistiche impiegate che Kruskal-naive si comporta peggio rispetto agli altri algoritmi per la ricerca di un MST.
-Nell'implementazione sviluppata la complessità è inferiore a O(mn), ma superiore a quella di Prim e Kruskal.
-Tratteremo l'ottimizzazione introdotta nella sezione successiva.
+Dai risultati ottenuti si può vedere che malgrado l'algoritmo di Held Karp sia un algoritmo esatto richiede molto tempo per trovare il risultato cercato. Troncando il tempo di esecuzione a tre minuti, la soluzione esatta viene trovata solamente per i grafi più piccoli, composti da al massimo $16$ nodi.
+Gli algoritmi cheapest insertion e 2-approssimazione invece impiegano un tempo accettabile su tutti i grafi (entro i $10$ minuti impiegati da cheapest insertion per il grafo più grande). Questo è dovuto alla complessità molto inferiore rispetto a quella di Held Karp, che è esponenziale.
+L'algoritmo migliore rispetto all'errore di approssimazione risulta essere stranamente cheapest insertion, pur non promettendo un bound superiore garantito.
+Da quanto visto a lezione tale limite dovrebbe essere uguale a quello dell'algoritmo di 2-approssimazione, che effettivamente risulta rispettato.
+L'algoritmo più veloce nel calcolo dell'approssimazione è quello di 2-approssimazione, che commette però un errore più elevato rispetto agli altri due algoritmi (in realtà l'errore più elevato è commesso da Held Karp con interruzione, ma senza considerare un'interruzione ai tre minuti tale algoritmo fornirebbe un risultato esatto).
