@@ -1,9 +1,8 @@
 \chapter{Conclusioni\label{sec:conclusioni}}
 
 \section{Risultati ottenuti\label{sec:risultati-ottenuti}}
-Dai risultati ottenuti possiamo dire che Kruskal con Union Find e Prim hanno una complessità molto inferiore rispetto a Kruskal naive nella ricerca di un MST.
-
-\section{Pesi degli MST\label{sec:pesi-mst}}
-Di seguito riportiamo, per ogni grafo compreso nel dataset, il peso complessivo del rispettivo minimum spanning tree e il tempo di esecuzioni per i tre algoritmi.
-
-    
+Dai risultati ottenuti possiamo dire che l'analisi della complessità dei vari algoritmi rispecchia i tempi impiegati per il calcolo dei risultati.
+Held Karp impiega molto tempo, pur essendo un algoritmo esatto, mentre cheapest insertion e 2-approssimazione forniscono un'approssimazione del risultato.
+Considerati i tempi impiegati e le soluzioni approssimate, si può dire che avendo tempo infinito a disposizione l'algoritmo preferibile è Held Karp.
+Mettendo un bound a cheapest insertion, pur essendo un algoritmo euristico, tale algoritmo è preferibile rispetto a quello di 2-approssimazione, per un errore minore commesso nel calcolo del risultato.
+Nel caso sia necessario avere un risultato approssimato con garanzia del bound di 2-approsimazione nel minor tempo possibile, l'algoritmo migliore risulta essere quello di 2-approssimazione.

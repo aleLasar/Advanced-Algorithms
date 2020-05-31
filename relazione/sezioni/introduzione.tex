@@ -55,7 +55,7 @@ In seguito riportiamo lo pseudocodice degli algoritmi, e la parte saliente del c
             return mindist
 \end{minted}
 
-Per tenere memoria delle distanze minime e dei nodi predecessori abbiamo utilizzato dizionari di python, in modo da mantenere l'indicizzazione attraverso nodo destinazione , lista dei nodi coperti vista a lezione.
+Per tenere memoria delle distanze minime e dei nodi predecessori abbiamo utilizzato dizionari di python, in modo da mantenere l'indicizzazione attraverso (nodo destinazione , lista dei nodi coperti) vista a lezione.
 Avendo l'algoritmo una complessità O(\(2^{n}\)) è stata inserito un meccanismo per fermare il calcolo dopo un numero di secondi specificabile non noto a priori.
 
 \clearpage
@@ -94,7 +94,7 @@ Avendo l'algoritmo una complessità O(\(2^{n}\)) è stata inserito un meccanismo
 
 In questo algoritmo costruiamo una lista dei nodi di un MST trovato usando Prim in ordine prefisso, aggiungendo al termine della lista il nodo radice.
 Funziona perché vale la disuguaglianza triangolare, ovvero per arrivare da un nodo sorgente a un nodo destinazione la soluzione migliore include l'arco che li collega direttamente.
-Osservando la soluzione peggiore di TSP trovata con l'algoritmo, si vede che non può essere peggiore rispetto a prendere 2 volte la soluzione ottima.
+Osservando la soluzione peggiore di TSP trovata con l'algoritmo, si vede che non può essere peggiore rispetto a prendere due volte il costo della soluzione ottima.
 Quindi l'algoritmo di 2-approssimazione è corretto.
 
 \clearpage
