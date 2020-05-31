@@ -211,6 +211,7 @@ def cheapest_insertion(G:Graph):
             weight_sol += local_min*2
             nodes_e = local_edge[0].nodes()
             edges_sol[nodes_e[0].name(), nodes_e[1].name()] = local_edge[0]
+            edges_sol[nodes_e[1].name(), nodes_e[0].name()] = Edge(nodes_e[1], nodes_e[0], local_edge[0].weight())
         else:
             weight_sol += local_edge[0].weight() + local_edge[1].weight() - local_edge[2].weight()
             nodes_0 = local_edge[0].nodes()
