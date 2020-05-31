@@ -56,7 +56,7 @@ In seguito riportiamo lo pseudocodice degli algoritmi, e la parte saliente del c
 \end{minted}
 
 Per tenere memoria delle distanze minime e dei nodi predecessori abbiamo utilizzato dizionari di python, in modo da mantenere l'indicizzazione attraverso (nodo destinazione , lista dei nodi coperti) vista a lezione.
-Avendo l'algoritmo una complessità O(\(2^{n}\)) è stata inserito un meccanismo per fermare il calcolo dopo un numero di secondi specificabile non noto a priori.
+Dato che l'algoritmo ha una complessità O(\(2^{n}\)) è stata inserito un meccanismo per fermare il calcolo dopo un numero di secondi specificabile.
 
 \clearpage
 
@@ -147,8 +147,7 @@ Quindi l'algoritmo di 2-approssimazione è corretto.
             weight_sol += local_min*2
             nodes_e = local_edge[0].nodes()
             edges_sol[nodes_e[0].name(), nodes_e[1].name()] = local_edge[0]
-
-            
+			edges_sol[nodes_e[1].name(), nodes_e[0].name()] = Edge(nodes_e[1], nodes_e[0], local_edge[0].weight())            
         else:
             weight_sol += local_edge[0].weight() + local_edge[1].weight()\
             - local_edge[2].weight()
@@ -161,9 +160,8 @@ Quindi l'algoritmo di 2-approssimazione è corretto.
 
     return weight_sol
 \end{minted}
-
-Questo algoritmo di euristica costruttiva parte da un nodo radice, sceglie l'arco di costo minimo e il nodo destinazione.
-Dopodiché viene preso ogni volta un nodo non presente nella soluzione in modo da minimizzare il costo complessivo della soluzione trovata, ovvero prendendo quel nodo non incluso nella soluzione tale che la somma del peso degli archi per connetterlo togliendo l'arco che connetteva i due nodi a cui quest'ultimo è connesso sia la più piccola possibile.
+Questo algoritmo di euristica costruttiva parte da un nodo radice e sceglie l'arco incidente su questo nodo che sia di costo minimo. 
+Dopodiché per ogni nodo k, non presente nella soluzione del cammino minimo, vengono scelti due archi: ik e jk, tali che i nodi i, j appartengono alla solucione e tali archi minimizzano la somma tra i lori pesi e la differenza tra il peso dell'arco ij.
 
 \subsection{Scelte implementative comuni\label{sec:comuni}}
 Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.
