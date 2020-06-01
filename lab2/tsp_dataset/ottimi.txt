@@ -1,0 +1,13 @@
+burma14.tsp:3323
+ulysses16.tsp:6859
+ulysses22.tsp:7013
+eil51.tsp:426
+berlin52.tsp:7542
+kroD100.tsp:21294
+kroA100.tsp:21282
+ch150.tsp:6528
+gr202.tsp:40160
+gr229.tsp:134602
+pcb442.tsp:50778 
+d493.tsp:35002
+dsj1000.tsp:18659688 
