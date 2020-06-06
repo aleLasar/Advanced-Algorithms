@@ -116,16 +116,19 @@ def karger(graph):
         newname = graph.inc_lastnode()
         newadjacents = list(set(
             adjacents_src + list(set(adjacents_dest)-set(adjacents_src))) - set((src, dest)))
-        print(newadjacents)    
+           
         newnode = Node(newname, src.index()) 
-        newnode.set_adjacents(newadjacents)   
+        newnode.set_adjacents(newadjacents) 
+        print(newnode)
+        print(newadjacents)  
         for node in newadjacents:
-            for i,adjacent in enumerate(node.adjacents()):
-                if adjacent is src:
-                    node.adjacents()[i] = newnode
+            adjacents = node.adjacents()
+            for i,adjacent in enumerate(adjacents):
+                if adjacent is src or adjacent is dest:
+                    adjacents[i] = newnode
         nodes[src_index] = None
         nodes[dest_index] = newnode
-        src = random.choice(newadjacents)
+        src = newnode
         src_index = src.index()
 
 
