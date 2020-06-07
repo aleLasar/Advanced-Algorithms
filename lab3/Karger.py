@@ -30,7 +30,7 @@ class Node():
         return self._name == other._name
 
     def __hash__(self):
-        return self._name    
+        return self._name
 
     def __ne__(self, other):
         return self._name != other._name
@@ -48,7 +48,7 @@ class Node():
         return self._index
 
     def set_index(self, index):
-        self._index = index    
+        self._index = index
 
     def adjacents(self):
         return self._adjacents
@@ -102,7 +102,7 @@ class Graph():
 def karger(graph):
     nodes = graph.nodes()
     print(nodes)
-    src_index = random.randint(0,len(nodes)-1)
+    src_index = random.randint(0, len(nodes)-1)
     src = nodes[src_index]
     print(src)
     print(src.adjacents())
@@ -114,16 +114,16 @@ def karger(graph):
         print(dest.adjacents())
         adjacents_dest = dest.adjacents()
         newname = graph.inc_lastnode()
-        newadjacents = list(set(
-            adjacents_src + list(set(adjacents_dest)-set(adjacents_src))) - set((src, dest)))
-           
-        newnode = Node(newname, src.index()) 
-        newnode.set_adjacents(newadjacents) 
+        adjacents_src = [adjacent for adjacent in adjacents_src if adjacent != dest]
+        adjacents_dest = [adjacent for adjacent in adjacents_dest if adjacent != src]
+        newadjacents = adjacents_src + adjacents_dest
+        newnode = Node(newname, dest.index())
+        newnode.set_adjacents(newadjacents)
         print(newnode)
-        print(newadjacents)  
+        print(newadjacents)
         for node in newadjacents:
             adjacents = node.adjacents()
-            for i,adjacent in enumerate(adjacents):
+            for i, adjacent in enumerate(adjacents):
                 if adjacent is src or adjacent is dest:
                     adjacents[i] = newnode
         nodes[src_index] = None
