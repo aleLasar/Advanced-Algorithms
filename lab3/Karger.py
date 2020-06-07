@@ -1,3 +1,4 @@
+import copy
 import math
 import os
 import random
@@ -99,28 +100,23 @@ class Graph():
         return self._lastnode
 
 
-def karger(graph):
+def full_contraction(graph):
     nodes = graph.nodes()
-    print(nodes)
     src_index = random.randint(0, len(nodes)-1)
     src = nodes[src_index]
-    print(src)
-    print(src.adjacents())
     for i in range(len(nodes)-2):
         adjacents_src = src.adjacents()
         dest = random.choice(adjacents_src)
         dest_index = dest.index()
-        print(dest)
-        print(dest.adjacents())
         adjacents_dest = dest.adjacents()
         newname = graph.inc_lastnode()
-        adjacents_src = [adjacent for adjacent in adjacents_src if adjacent != dest]
-        adjacents_dest = [adjacent for adjacent in adjacents_dest if adjacent != src]
+        adjacents_src = [
+            adjacent for adjacent in adjacents_src if adjacent != dest]
+        adjacents_dest = [
+            adjacent for adjacent in adjacents_dest if adjacent != src]
         newadjacents = adjacents_src + adjacents_dest
         newnode = Node(newname, dest.index())
         newnode.set_adjacents(newadjacents)
-        print(newnode)
-        print(newadjacents)
         for node in newadjacents:
             adjacents = node.adjacents()
             for i, adjacent in enumerate(adjacents):
@@ -130,6 +126,25 @@ def karger(graph):
         nodes[dest_index] = newnode
         src = newnode
         src_index = src.index()
+    mincut = 0
+    for node in nodes:
+        if node is not None:
+            for adjacent in node.adjacents():
+                if adjacent is not None:
+                    mincut += 1
+            break
+    return mincut
+
+
+def karger(graph, k):
+    mincut = float("inf")
+    original = copy.deepcopy(graph)
+    for _ in range(k):
+        fc = full_contraction(graph)
+        if fc < mincut:
+            mincut = fc
+        graph = copy.deepcopy(original)    
+    return mincut
 
 
 def read_file(filename):
@@ -153,19 +168,12 @@ def errore(soluzione, ottimo):
     return str((soluzione-ottimo)/ottimo)
 
 
-def main(folder):
+def main(folder, k):
     with os.scandir(folder) as it:
-        for i, entry in enumerate(it):
+        for entry in it:
             if "input_random_1_6" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
-                karger(graph)
-                nodes = graph.nodes()
-                for node in nodes:
-                    if node is not None:
-                        print(node)
-                        for adjacent in node.adjacents():
-                            if adjacent is not None:
-                                print("  "+str(adjacent))
+                mincut = karger(graph, k)
                 """print(entry.name)
                 start = time.time()
                 dist = cheapest_insertion(graph)
@@ -178,4 +186,4 @@ def main(folder):
 
 
 if __name__ == "__main__":
-    main("mincut_dataset")
+    main("mincut_dataset", int(sys.argv[1]))
