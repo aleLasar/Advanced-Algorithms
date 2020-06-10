@@ -102,20 +102,23 @@ class Graph():
 
 def full_contraction(graph):
     nodes = graph.nodes()
-    src_index = random.randint(0, len(nodes)-1)
-    src = nodes[src_index]
+    not_removed = list(nodes)
     for i in range(len(nodes)-2):
+        src_index = random.randint(0, len(not_removed)-1)
+        src = not_removed[src_index]
         adjacents_src = src.adjacents()
         dest = random.choice(adjacents_src)
         dest_index = dest.index()
         adjacents_dest = dest.adjacents()
         newname = graph.inc_lastnode()
         adjacents_src = [
-            adjacent for adjacent in adjacents_src if adjacent != dest]
+            adjacent for adjacent in adjacents_src if adjacent != dest
+        ]
         adjacents_dest = [
-            adjacent for adjacent in adjacents_dest if adjacent != src]
+            adjacent for adjacent in adjacents_dest if adjacent != src
+        ]
         newadjacents = adjacents_src + adjacents_dest
-        newnode = Node(newname, dest.index())
+        newnode = Node(newname, dest_index)
         newnode.set_adjacents(newadjacents)
         for node in newadjacents:
             adjacents = node.adjacents()
@@ -124,10 +127,10 @@ def full_contraction(graph):
                     adjacents[i] = newnode
         nodes[src_index] = None
         nodes[dest_index] = newnode
-        src = newnode
-        src_index = src.index()
+        del not_removed[src_index]
+
     mincut = 0
-    for node in nodes:
+    for node in not_removed:
         if node is not None:
             for adjacent in node.adjacents():
                 if adjacent is not None:
@@ -143,7 +146,7 @@ def karger(graph, k):
         fc = full_contraction(graph)
         if fc < mincut:
             mincut = fc
-        graph = copy.deepcopy(original)    
+        graph = copy.deepcopy(original)
     return mincut
 
 
@@ -174,6 +177,7 @@ def main(folder, k):
             if "input_random_1_6" in entry.name:
                 graph = read_file(folder+"/"+entry.name)
                 mincut = karger(graph, k)
+                print(str(mincut))
                 """print(entry.name)
                 start = time.time()
                 dist = cheapest_insertion(graph)
