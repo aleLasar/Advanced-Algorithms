@@ -1,3 +1,4 @@
+import argparse
 import copy
 import math
 import os
@@ -13,7 +14,6 @@ class Node():
         self._name = name
         self._index = index
         self._adjacents = []
-        self._visited = False
 
     def __gt__(self, other):
         return self._name > other._name
@@ -59,12 +59,6 @@ class Node():
 
     def set_adjacents(self, adjacents):
         self._adjacents = adjacents
-
-    def visited(self):
-        return self._visited
-
-    def set_visited(self, visited):
-        self._visited = visited
 
 # %%
 
@@ -139,15 +133,25 @@ def full_contraction(graph):
     return mincut
 
 
-def karger(graph, k):
+def karger(graph, k, ottimo):
     mincut = float("inf")
     original = copy.deepcopy(graph)
+    time_fc = 0
+    time_discovery = 0
     for _ in range(k):
+        fc_start = time.time()
         fc = full_contraction(graph)
+        if fc == ottimo:
+            time_discovery = time.time() - fc_start
+        elif fc < ottimo:
+            ottimo = fc
+            time_discovery = time.time() - fc_start
+        time_fc += time.time() - fc_start
         if fc < mincut:
             mincut = fc
         graph = copy.deepcopy(original)
-    return mincut
+    time_fc = int(time_fc / k)
+    return mincut, time_fc, time_discovery
 
 
 def read_file(filename):
@@ -168,26 +172,40 @@ def read_file(filename):
 
 
 def errore(soluzione, ottimo):
-    return str((soluzione-ottimo)/ottimo)
+    return (soluzione-ottimo)/ottimo
 
 
-def main(folder, k):
+def main(folder, d=1):
     with os.scandir(folder) as it:
         for entry in it:
-            if "input_random_1_6" in entry.name:
-                graph = read_file(folder+"/"+entry.name)
-                mincut = karger(graph, k)
-                print(str(mincut))
-                """print(entry.name)
-                start = time.time()
-                dist = cheapest_insertion(graph)
-                time_exec = time.time() - start
-                test = entry.name.replace(".tsp", ".out")
-                result = open(folder+"/"+test, "a")
-                result.write("\nCheapest_Insertion - soluzione: " +
-                             str(dist)+" tempo: "+str(time_exec) + " errore: "+errore(dist, ottimo)+" %")
-                result.close()"""
+            graph = read_file(folder+"/"+entry.name)
+            n = len(graph.nodes())
+            k = math.ceil(d * math.pow(n, 2) / 2 * math.log(n))
+            file = open(folder + '/' +
+                        entry.name.replace("input", "output"), "r")
+            ottimo = int(file.readline())
+            file.close()
+            karger_start = time.time()
+            mincut, time_fc, time_discovery = karger(graph, k, ottimo)
+            time_karger = time.time() - karger_start
+            if mincut < ottimo:
+                ottimo = mincut
+                file = open(folder + '/' +
+                            entry.name.replace("input", "output_nostro"), "w")
+                file.write(mincut)
+                file.close()
+            errore_perc = errore(mincut, ottimo)*100
+            file = open(folder + '/' +
+                        entry.name.replace("input", "risultati"), "w")
+            file.write("time_fc:"+str(time_fc)+" time_discovery:"+str(time_discovery) +
+                       " time_karger:"+str(time_karger)+" errore_perc:"+str(errore_perc))
+            file.close()
 
 
 if __name__ == "__main__":
-    main("mincut_dataset", int(sys.argv[1]))
+    sys.setrecursionlimit(999999999)
+    parser = argparse.ArgumentParser(description='Laboratorio 3 - Minimum Cut')
+    parser.add_argument('d', default=1, type=int, nargs='?',
+                        help='Parametro per identificare la probabilità che l\'algoritmo abbia successo come esponente del denominatore (default =1).')
+    args = parser.parse_args()
+    main("mincut_dataset", int(args.d))
