@@ -150,7 +150,7 @@ def karger(graph, k, ottimo):
         if fc < mincut:
             mincut = fc
         graph = copy.deepcopy(original)
-    time_fc = int(time_fc / k)
+    time_fc = time_fc / k
     return mincut, time_fc, time_discovery
 
 
