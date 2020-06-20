@@ -178,28 +178,31 @@ def errore(soluzione, ottimo):
 def main(folder, d=1):
     with os.scandir(folder) as it:
         for entry in it:
-            graph = read_file(folder+"/"+entry.name)
-            n = len(graph.nodes())
-            k = math.ceil(d * math.pow(n, 2) / 2 * math.log(n))
-            file = open(folder + '/' +
-                        entry.name.replace("input", "output"), "r")
-            ottimo = int(file.readline())
-            file.close()
-            karger_start = time.time()
-            mincut, time_fc, time_discovery = karger(graph, k, ottimo)
-            time_karger = time.time() - karger_start
-            if mincut < ottimo:
-                ottimo = mincut
+            if "input" in entry.name and ("175" in entry.name or "200" in entry.name):
+                graph = read_file(folder+"/"+entry.name)
+                n = len(graph.nodes())
+                if n > 100:
+                    n = 100
+                k = math.ceil(d * math.pow(n, 2) / 2 * math.log(n))
                 file = open(folder + '/' +
-                            entry.name.replace("input", "output_nostro"), "w")
-                file.write(mincut)
+                            entry.name.replace("input", "output"), "r")
+                ottimo = int(file.readline())
                 file.close()
-            errore_perc = errore(mincut, ottimo)*100
-            file = open(folder + '/' +
-                        entry.name.replace("input", "risultati"), "w")
-            file.write("time_fc:"+str(time_fc)+" time_discovery:"+str(time_discovery) +
-                       " time_karger:"+str(time_karger)+" errore_perc:"+str(errore_perc))
-            file.close()
+                karger_start = time.time()
+                mincut, time_fc, time_discovery = karger(graph, k, ottimo)
+                time_karger = time.time() - karger_start
+                if mincut < ottimo:
+                    ottimo = mincut
+                    file = open(folder + '/' +
+                                entry.name.replace("input", "output_nostro"), "w")
+                    file.write(mincut)
+                    file.close()
+                errore_perc = errore(mincut, ottimo)*100
+                file = open(folder + '/' +
+                            entry.name.replace("input", "risultati"), "w")
+                file.write("time_fc:"+str(time_fc)+" time_discovery:"+str(time_discovery) +
+                           " time_karger:"+str(time_karger)+" errore_perc:"+str(errore_perc))
+                file.close()
 
 
 if __name__ == "__main__":
