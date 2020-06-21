@@ -138,12 +138,15 @@ def karger(graph, k, ottimo):
     original = copy.deepcopy(graph)
     time_fc = 0
     time_discovery = 0
+    found = False
     for _ in range(k):
         fc_start = time.time()
         fc = full_contraction(graph)
-        if fc <= ottimo:
+        if fc == ottimo and not found:
             time_discovery = time.time()
+            found = True
         elif fc < ottimo:
+            time_discovery = time.time()
             ottimo = fc
         time_fc += time.time() - fc_start
         if fc < mincut:
