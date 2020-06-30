@@ -1,0 +1,29 @@
+\chapter{Risultati\label{sec:risultati}}
+\noindent In questa sezione mostriamo i risultati ottenuti dall'algoritmo, ovvero i tempi medi impiegati per full contraction e karger, il discovery time, la soluzione trovata, la soluzione attesa e l'errore relativo.
+
+\section{Tabella\label{sec:tabella}}
+
+\footnotesize
+\begin{tabularx}{\textwidth}{*{10}{Y}}
+    \toprule
+    \textbf{Istanza} & \textbf{Full contraction} & \textbf{Karger} & \textbf{Discovery time} & \textbf{Risultato} & \textbf{Ottimo} & \textbf{Errore relativo}\\
+    \endfirsthead
+    \toprule
+    \textbf{Istanza} & \textbf{Full contraction} & \textbf{Karger} & \textbf{Discovery time} & \textbf{Risultato} & \textbf{Ottimo} & \textbf{Errore relativo}\\
+    \endhead
+    \midrule
+    
+    \bottomrule
+    \caption{Risultati}\label{tab:risultati}
+\end{tabularx}
+
+\normalsize
+
+\clearpage
+
+\section{Risultati\label{sec:risultati}}
+Dai risultati ottenuti si può vedere che malgrado l'algoritmo di Held Karp sia un algoritmo esatto richiede molto tempo per trovare il risultato cercato. Troncando il tempo di esecuzione a tre minuti, la soluzione esatta viene trovata solamente per i grafi più piccoli, composti al massimo da $16$ nodi.
+Gli algoritmi cheapest insertion e 2-approssimazione invece impiegano un tempo accettabile su tutti i grafi (entro i $10$ minuti impiegati da cheapest insertion per il grafo più grande). Questo è dovuto alla complessità molto inferiore rispetto a quella di Held Karp, che è esponenziale.
+L'algoritmo migliore, rispetto all'errore di approssimazione, risulta essere stranamente cheapest insertion, pur non promettendo un bound superiore garantito.
+Da quanto visto a lezione tale limite dovrebbe essere uguale a quello dell'algoritmo di 2-approssimazione, che effettivamente risulta rispettato.
+L'algoritmo più veloce nel calcolo dell'approssimazione è quello di 2-approssimazione, che commette però un errore più elevato rispetto agli altri due algoritmi (in realtà l'errore più elevato è commesso da Held Karp con interruzione, ma senza considerare un'interruzione ai tre minuti tale algoritmo fornirebbe un risultato esatto).

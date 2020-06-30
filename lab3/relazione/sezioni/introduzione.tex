@@ -1,0 +1,103 @@
+\chapter{Introduzione\label{sec:introduzione}}
+\noindent La relazione descrive l'algoritmo implementato da Alessio Lazzaron e Matteo Marchiori per il terzo laboratorio del corso di algoritmi avanzati.
+
+\section{Descrizione dell'algoritmo\label{sec:descrizione}}
+L'unico algoritmo implementato per questo laboratorio è quello di Karger.
+In seguito poniamo lo pseudocodice e la parte interessante del codice in python per un rapido confronto, e alcune scelte fatte durante l'implementazione.
+
+\subsection{Algoritmo di Karger\label{sec:karger}}
+\begin{verbatim}
+    Full_contraction(G=(V,E)):
+        for i = 1 to |V| - 2 do:
+            e = random(E)
+            G' = (V, E') = G/e
+            V = V'
+            E = E'
+        return |E|    
+    
+    Karger(G=(V,E), k):
+        min = \(\infty\)
+        for i = 1 to k do:
+            t = Full_contraction(G)
+            if t < min:
+                min = t
+        return min                
+\end{verbatim}
+
+\clearpage
+
+\begin{minted}{python}
+    def full_contraction(graph):
+        nodes = graph.nodes()
+        not_removed = list(nodes)
+        for i in range(len(nodes)-2):
+            src_index = random.randint(0, len(not_removed)-1)
+            src = not_removed[src_index]
+            adjacents_src = src.adjacents()
+            dest = random.choice(adjacents_src)
+            dest_index = dest.index()
+            adjacents_dest = dest.adjacents()
+            newname = graph.inc_lastnode()
+            adjacents_src = [
+                adjacent for adjacent in adjacents_src if adjacent != dest
+            ]
+            adjacents_dest = [
+                adjacent for adjacent in adjacents_dest if adjacent != src
+            ]
+            newadjacents = adjacents_src + adjacents_dest
+            newnode = Node(newname, dest_index)
+            newnode.set_adjacents(newadjacents)
+            for node in newadjacents:
+                adjacents = node.adjacents()
+                for i, adjacent in enumerate(adjacents):
+                    if adjacent is src or adjacent is dest:
+                        adjacents[i] = newnode
+            nodes[src_index] = None
+            nodes[dest_index] = newnode
+            del not_removed[src_index]
+
+        mincut = 0
+        for node in not_removed:
+            if node is not None:
+                for adjacent in node.adjacents():
+                    if adjacent is not None:
+                        mincut += 1
+                break
+        return mincut
+
+
+    def karger(graph, k, ottimo):
+        mincut = float("inf")
+        original = copy.deepcopy(graph)
+        time_fc = 0
+        time_discovery = 0
+        found = False
+        for _ in range(k):
+            fc_start = time.time()
+            fc = full_contraction(graph)
+            if fc == ottimo and not found:
+                time_discovery = time.time()
+                found = True
+            elif fc < ottimo:
+                time_discovery = time.time()
+                ottimo = fc
+            time_fc += time.time() - fc_start
+            if fc < mincut:
+                mincut = fc
+            graph = copy.deepcopy(original)
+        time_fc = time_fc / k
+        return mincut, time_fc, time_discovery
+
+\end{minted}
+
+
+
+\clearpage
+
+Nell'algoritmo full\_contraction la contrazione di due nodi avviene creando un nuovo nodo nel grafo che unisce due nodi presi a caso, il primo dai nodi non ancora eliminati, il secondo tra i possibili nodi adiacenti al primo scelto (di modo da avere almeno un arco esistente tra questi).
+Il nuovo nodo ha come nodi adiacenti i nodi adiacenti presi dai nodi scelti, e viene posto al posto del secondo nodo scelto, mentre il primo viene impostato a None.
+Alla fine la procedura restituisce il taglio trovato.
+
+Il secondo algoritmo viene fatto ciclare k volte, dove k è determinato con la formula vista a lezione. Vengono determinati i tempi richiesti e prima di chiamare full\_contraction il grafo viene impostato alla versione fornita in input (pertanto vi sarà uno scarto temporale che dipende dalla dimensione del grafo e da k nella stima dei tempi dell'algoritmo di karger).
+
+Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.

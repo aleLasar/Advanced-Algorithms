@@ -1,0 +1,7 @@
+\chapter{Originalità\label{sec:originalita}}
+\noindent In questa sezione vengono presentate le originalità che abbiamo inserito nella nostra implementazione dell'algoritmo.
+
+È possibile ottenere probabilità di insuccesso diverse nell'algoritmo cambiando il parametro d passato da linea di comando.
+Di default il parametro è impostato a $1$ per avere una probabilità di insuccesso pari a \(\frac{1}{n}\), dove n è il numero dei nodi del grafo.
+
+Nell'implementazione sviluppata abbiamo impostato k a un valore inferiore quando la taglia del grafo supera i $75$ nodi, ovvero a una costante in cui n vale $75$, ottenendo come k il valore \(\frac{75^{2}}{2}\cdot ln(75)\), questo per evitare tempistiche improponibili per l'esecuzione dell'algoritmo.

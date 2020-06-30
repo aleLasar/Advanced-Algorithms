@@ -1,0 +1,32 @@
+%\phantomsection
+%\addcontentsline{toc}{chapter}{Frontespizio}
+\begin{frontespizio}
+
+    \makeatletter\@makeother\#
+    \Preambolo{\makeatletter}
+    \Preambolo{\renewcommand{\Relatore}[1]{
+        \advance\front@relcount\@ne
+            \front@reltoks=\expandafter{\the\front@reltoks\\#1%
+                \ifdefined\front@signatures\\[1cm]
+                \dotfill\\\fi
+            }
+        }
+    }
+    
+    \Preambolo{\makeatother}
+
+    \Universita{Padova}
+    \Filigrana[height=3cm,before=2,after=7]{immagini/unipd}
+    \Dipartimento{Matematica ``Tullio Levi-Civita''}
+    \Corso{Informatica}
+    \Annoaccademico{2019--2020}
+    \Titolo{Laboratorio di Algoritmi Avanzati}
+    \Sottotitolo{Minimum Cut}
+    \NCandidato{Studente}
+    \NRelatore{Studente}{}
+    \Candidato{Alessio Lazzaron\\\normalsize Matricola 1242456}
+    \Relatore{Matteo Marchiori\\\normalsize Matricola 1236329}
+    \Rientro{3cm}
+    %\Margini{4cm}{5cm}{4cm}{3cm}
+    \Preambolo{\usepackage{iwona}}
+\end{frontespizio}
