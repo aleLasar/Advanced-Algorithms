@@ -1,6 +1,21 @@
 \chapter{Risultati\label{sec:risultati}}
 \noindent In questa sezione mostriamo i risultati ottenuti dall'algoritmo, ovvero i tempi medi impiegati per full contraction e karger, il discovery time, la soluzione trovata, la soluzione attesa e l'errore relativo.
 
+\section{Grafici\label{sec:grafici}}
+
+\subsection{Full contraction\label{sec:fc}}
+
+Il presente grafico illustra i tempi di calcolo della procedura Full\_Contraction sui grafi del dataset al variare del numero di vertici. Confrontiamo con la complessità asintotica stimata di \(O(n^{2})\).
+
+\subsection{Karger\label{sec:karger}}
+
+Il presente grafico illustra i tempi di calcolo dell'algoritmo di Karger sui grafi del dataset al variare del numero di vertici. La probabilità di errore è uguale a \(\frac{1}{n}\) di sbagliare per grafi inferiori a $75$ nodi. Tale scelta è dovuta a motivi di tempo, come illustrato in sezione \vref{sec:originalita}. Confrontiamo con la complessità asintotica stimata di \(O(n^{4}log(n))\).
+
+\subsection{Discovery time\label{sec:dt}}
+
+Il presente grafico illustra i tempi di calcolo dell'algoritmo di Karger per trovare la soluzione ottima per la prima volta. Confrontiamo i risultati con il tempo di esecuzione complessivo.
+
+
 \section{Tabella\label{sec:tabella}}
 
 \footnotesize
