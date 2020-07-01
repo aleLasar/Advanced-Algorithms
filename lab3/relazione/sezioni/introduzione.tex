@@ -93,10 +93,14 @@ In seguito poniamo lo pseudocodice e la parte interessante del codice in python 
 
 \end{minted}
 
-Nell'algoritmo full\_contraction la contrazione di due nodi avviene creando un nuovo nodo nel grafo che unisce due nodi presi a caso, il primo dai nodi non ancora eliminati, il secondo tra i possibili nodi adiacenti al primo scelto (di modo da avere almeno un arco esistente tra questi).
-Il nuovo nodo ha come nodi adiacenti i nodi adiacenti presi dai nodi scelti, e viene memorizzato al posto del secondo nodo scelto, sovrascrivendolo, mentre il primo viene impostato a None, eliminandolo.
+Nell'algoritmo \textit{full\_contraction} la contrazione di due nodi avviene creando un nuovo nodo nel grafo che unisce due nodi presi randomicamente: il primo dai nodi non ancora eliminati mentre il secondo tra i possibili nodi adiacenti al primo, in modo da avere almeno un arco esistente tra i due.
+Inoltre il nuovo nodo avrà come nodi adiacenti i nodi adiacenti dei nodi scelti e verrà memorizzato al posto del secondo nodo, sovrascrivendolo, mentre il primo verrà impostato a None così eliminandolo.
 Alla fine la procedura restituisce il taglio trovato.
 
-Il secondo algoritmo viene fatto ciclare k volte, dove k è determinato con la formula vista a lezione. Vengono determinati i tempi richiesti e prima di chiamare full\_contraction il grafo viene impostato alla versione fornita in input (pertanto vi sarà uno scarto temporale che dipende dalla dimensione del grafo e da k nella stima dei tempi dell'algoritmo di karger).
+La funzione chiamata \textit{Karger}, invece, fa eseguire la procedura \textit{full\_contraction} k volte, dove k viene determinato con la seguente formula: 
+
+\centerline{\(\frac{n^{2}}{2}\cdot ln(n)\)}
+
+Inoltre prima di ogni nuovo chiamata alla funzione \textit{full\_contraction} il grafo viene impostato alla versione fornita in input e calcolato il tempo di esecuzione. Tuttavia nella stima dei tempi dell'algoritmo di karger è presente uno scarto temporale che dipende dalla dimensione del grafo e dal parametro k.
 
 Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.
