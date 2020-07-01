@@ -27,10 +27,10 @@ Il presente grafico illustra i tempi di calcolo dell'algoritmo di Karger per tro
 \footnotesize
 \begin{tabularx}{\textwidth}{*{10}{Y}}
     \toprule
-    \textbf{Istanza} & \textbf{Full contraction} & \textbf{Karger} & \textbf{Discovery time} & \textbf{Risultato} & \textbf{Ottimo} & \textbf{Errore relativo}\\
+    \textbf{Istanza} & \textbf{Tempo di una Full contraction (s)} & \textbf{Discovery time (s)} & \textbf{Tempo totale (s)} & \textbf{Soluzione trovata} & \textbf{Soluzione ottimo} & \textbf{Errore relativo}\\
     \endfirsthead
     \toprule
-    \textbf{Istanza} & \textbf{Full contraction} & \textbf{Karger} & \textbf{Discovery time} & \textbf{Risultato} & \textbf{Ottimo} & \textbf{Errore relativo}\\
+    \textbf{Istanza} & \textbf{Tempo di una Full contraction (s)} & \textbf{Discovery time (s)} & \textbf{Tempo totale (s)} & \textbf{Soluzione trovata} & \textbf{Soluzione ottimo} & \textbf{Errore relativo}\\
     \endhead
     \midrule
     input_01_6	&	0.00006420	&	0.00131726	&	0.00717187	&	2	&	2	&	0.0
@@ -71,7 +71,7 @@ Il presente grafico illustra i tempi di calcolo dell'algoritmo di Karger per tro
 	input_36_175	&	0.65710520	&	6.00958300	&	8155.21835065	&	43	&	43	&	0.0
 	input_37_200	&	1.25286142	&	20.91466975	&	15461.59397507	&	54	&	54	&	0.0
 	input_38_200	&	1.05687901	&	163.0276653	&	13067.47582197	&	52	&	52	&	0.0
-	input_39_200	&	1.12854942	&	13,06262207	&	13932.64299393	&	51	&	51	&	0.0
+	input_39_200	&	1.12854942	&	13.06262207	&	13932.64299393	&	51	&	51	&	0.0
 	input_40_200	&	1.25152820	&	93.24242926	&	15435.27277613	&	61	&	61	&	0.0
 
 
@@ -84,8 +84,3 @@ Il presente grafico illustra i tempi di calcolo dell'algoritmo di Karger per tro
 \clearpage
 
 \section{Risultati\label{sec:risultati}}
-Dai risultati ottenuti si può vedere che malgrado l'algoritmo di Held Karp sia un algoritmo esatto richiede molto tempo per trovare il risultato cercato. Troncando il tempo di esecuzione a tre minuti, la soluzione esatta viene trovata solamente per i grafi più piccoli, composti al massimo da $16$ nodi.
-Gli algoritmi cheapest insertion e 2-approssimazione invece impiegano un tempo accettabile su tutti i grafi (entro i $10$ minuti impiegati da cheapest insertion per il grafo più grande). Questo è dovuto alla complessità molto inferiore rispetto a quella di Held Karp, che è esponenziale.
-L'algoritmo migliore, rispetto all'errore di approssimazione, risulta essere stranamente cheapest insertion, pur non promettendo un bound superiore garantito.
-Da quanto visto a lezione tale limite dovrebbe essere uguale a quello dell'algoritmo di 2-approssimazione, che effettivamente risulta rispettato.
-L'algoritmo più veloce nel calcolo dell'approssimazione è quello di 2-approssimazione, che commette però un errore più elevato rispetto agli altri due algoritmi (in realtà l'errore più elevato è commesso da Held Karp con interruzione, ma senza considerare un'interruzione ai tre minuti tale algoritmo fornirebbe un risultato esatto).
