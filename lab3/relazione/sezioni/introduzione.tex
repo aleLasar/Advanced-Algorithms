@@ -16,7 +16,7 @@ In seguito poniamo lo pseudocodice e la parte interessante del codice in python 
         return |E|    
     
     Karger(G=(V,E), k):
-        min = \(\infty\)
+        min = infinity
         for i = 1 to k do:
             t = Full_contraction(G)
             if t < min:
@@ -101,6 +101,6 @@ La funzione chiamata \textit{Karger}, invece, fa eseguire la procedura \textit{f
 
 \centerline{\(\frac{n^{2}}{2}\cdot ln(n)\)}
 
-Inoltre prima di ogni nuovo chiamata alla funzione \textit{full\_contraction} il grafo viene impostato alla versione fornita in input e calcolato il tempo di esecuzione. Tuttavia nella stima dei tempi dell'algoritmo di karger è presente uno scarto temporale che dipende dalla dimensione del grafo e dal parametro k.
+Inoltre prima di ogni nuova chiamata alla funzione \textit{full\_contraction} il grafo viene impostato alla versione fornita in input e calcolato il tempo di esecuzione. Tuttavia nella stima dei tempi dell'algoritmo di Karger è presente uno scarto temporale che dipende dalla dimensione del grafo e dal parametro k.
 
 Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.
