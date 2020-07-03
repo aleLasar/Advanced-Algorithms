@@ -94,13 +94,13 @@ In seguito poniamo lo pseudocodice e la parte interessante del codice in python 
 \end{minted}
 
 Nell'algoritmo \textit{full\_contraction} la contrazione di due nodi avviene creando un nuovo nodo nel grafo che unisce due nodi presi randomicamente: il primo dai nodi non ancora eliminati mentre il secondo tra i possibili nodi adiacenti al primo, in modo da avere almeno un arco esistente tra i due.
-Inoltre il nuovo nodo avrà come nodi adiacenti i nodi adiacenti dei nodi scelti e verrà memorizzato al posto del secondo nodo, sovrascrivendolo, mentre il primo verrà impostato a None così eliminandolo.
+Inoltre il nuovo nodo avrà come nodi adiacenti i nodi adiacenti dei nodi scelti e verrà memorizzato al posto del secondo nodo, sovrascrivendolo, mentre il primo verrà eliminato.
 Alla fine la procedura restituisce il taglio trovato.
 
 La funzione chiamata \textit{Karger}, invece, fa eseguire la procedura \textit{full\_contraction} k volte, dove k viene determinato con la seguente formula: 
 
 \centerline{\(\frac{n^{2}}{2}\cdot ln(n)\)}
 
-Inoltre prima di ogni nuova chiamata alla funzione \textit{full\_contraction} il grafo viene impostato alla versione fornita in input e calcolato il tempo di esecuzione. Tuttavia nella stima dei tempi dell'algoritmo di Karger è presente uno scarto temporale che dipende dalla dimensione del grafo e dal parametro k.
+Inoltre prima di ogni nuova chiamata alla funzione \textit{full\_contraction} il grafo viene impostato alla versione fornita in input e viene calcolato il tempo di esecuzione. Tuttavia nella stima dei tempi dell'algoritmo di Karger è presente uno scarto temporale che dipende dalla dimensione del grafo e dal parametro k.
 
 Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.
