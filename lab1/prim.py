@@ -1,4 +1,4 @@
-#%%
+# %%
 
 import math
 import os
@@ -7,6 +7,7 @@ import time
 
 PI = 3.141592
 RRR = 6378.388
+
 
 class Heap():
 
@@ -94,11 +95,12 @@ class Heap():
         result += "]"
         return result
 
-#%%
+# %%
+
 
 class Node():
 
-    def __init__(self,name, latitude, longitude):
+    def __init__(self, name, latitude, longitude):
         self._name = name
         self._key = sys.maxsize
         self._parent = None
@@ -130,13 +132,13 @@ class Node():
     def name(self):
         return self._name
 
-    def set_name(self,name):
+    def set_name(self, name):
         self._name = name
 
     def key(self):
         return self._key
 
-    def set_key(self,key):
+    def set_key(self, key):
         self._key = key
 
     def parent(self):
@@ -157,36 +159,37 @@ class Node():
     def present(self):
         return self._present
 
-    def set_present(self,present):
+    def set_present(self, present):
         self._present = present
 
     def latitude(self):
         return self._latitude
 
     def latitude_rad(self):
-        deg = int(self._latitude)
+        deg = math.trunc(self._latitude)
         rounded = self._latitude - deg
-        return PI * (deg + 5.0 * rounded / 3.0) / 180.0
+        return PI * (deg + 5.0 * (rounded / 3.0)) / 180.0
 
-    def set_latitude(self,latitude):
+    def set_latitude(self, latitude):
         self._latitude = latitude
 
     def longitude(self):
         return self._longitude
 
     def longitude_rad(self):
-        deg = int(self._longitude)
+        deg = math.trunc(self._longitude)
         rounded = self._longitude - deg
-        return PI * (deg + 5.0 * rounded / 3.0) / 180.0
+        return PI * (deg + 5.0 * (rounded / 3.0)) / 180.0
 
-    def set_longitude(self,longitude):
+    def set_longitude(self, longitude):
         self._longitude = longitude
 
     def children(self):
         return self._children
 
-    def add_child(self,child):
+    def add_child(self, child):
         self._children.append(child)
+
 
 class Edge():
 
@@ -218,11 +221,12 @@ class Edge():
     def node(self):
         return self._node
 
-#%%
+# %%
+
 
 class Graph():
 
-    def __init__(self,n):
+    def __init__(self, n):
         self._nodes = [None] * n
 
     def add_node(self, name, latitude, longitude):
@@ -234,29 +238,30 @@ class Graph():
             return self._nodes[name]
 
     def add_edge(self, src, dest, weight):
-        edge = Edge(dest,weight)
+        edge = Edge(dest, weight)
         self._nodes[src.name()].add_edge(edge)
-        edge2 = Edge(src,weight)
+        edge2 = Edge(src, weight)
         self._nodes[dest.name()].add_edge(edge2)
 
     def get_graph(self):
         return self._nodes
 
-    def is_node_present(self,name):
+    def is_node_present(self, name):
         return self._nodes[name] is not None
 
     def geo_distance(self, src, dest):
-        q1 = math.cos( src.longitude_rad() - dest.longitude_rad() )
-        q2 = math.cos( src.latitude_rad() - dest.latitude_rad())
-        q3 = math.cos( src.latitude_rad() + dest.latitude_rad())
-        return int( RRR * math.acos( 0.5*((1.0+q1)*q2 - (1.0-q1)*q3) ) + 1.0)
+        q1 = math.cos(src.longitude_rad() - dest.longitude_rad())
+        q2 = math.cos(src.latitude_rad() - dest.latitude_rad())
+        q3 = math.cos(src.latitude_rad() + dest.latitude_rad())
+        return math.trunc(RRR * math.acos(0.5*((1.0+q1)*q2 - (1.0-q1)*q3)) + 1.0)
 
     def euclide_distance(self, src, dest):
-        x = abs(src.latitude() - dest.latitude())
-        y = abs(src.longitude() - dest.longitude())
-        return int(math.sqrt(math.pow(x,2)+math.pow(y,2)))
+        x = src.latitude() - dest.latitude()
+        y = src.longitude() - dest.longitude()
+        return round(math.trunc(math.sqrt(math.pow(x, 2)+math.pow(y, 2))))
 
-#%%
+# %%
+
 
 def prim(graph, s):
     #mst_weight = 0
@@ -265,7 +270,7 @@ def prim(graph, s):
     heap_keys = Heap()
     for node in adjacency_list:
         heap_keys.push(node)
-    while len(heap_keys) !=0:
+    while len(heap_keys) != 0:
         u = heap_keys.pop()
         adjacents = adjacency_list[u.name()].edges()
         for edge in adjacents:
@@ -279,20 +284,23 @@ def prim(graph, s):
         if node.parent():
             parent = node.parent()
             parent.add_child(node)
-    #return graph
+    # return graph
+
 
 def preorder(preordered, v):
     preordered.append(v)
     for child in v.children():
         preorder(preordered, child)
 
-def approx_t_tsp(graph,s):
-    prim(graph,s)
+
+def approx_t_tsp(graph, s):
+    prim(graph, s)
     nodes = graph.get_graph()
     preordered = []
     preorder(preordered, nodes[s])
     preordered.append(nodes[s])
     return preordered
+
 
 def read_file(filename):
     file = open(filename, "r")
@@ -301,7 +309,7 @@ def read_file(filename):
 
     while True:
         line = file.readline()
-        line = line.replace(" :",":")
+        line = line.replace(" :", ":")
         if "NODE_COORD_SECTION" in line:
             break
         label, value = list(line.split(maxsplit=1))
@@ -315,51 +323,53 @@ def read_file(filename):
     for line in file:
         if "EOF" in line:
             break
-        if type == "GEO":
+        if "GEO" in type:
             tripla = list(map(float, line.split()))
         else:
-            tripla = list(map(int, map(round,map(float,line.split()))))
+            tripla = list(map(int, map(round, map(float, line.split()))))
         graph.add_node(int(tripla[0])-1, tripla[1], tripla[2])
     nodes = graph.get_graph()
     for index_src in range(len(nodes)):
         for index_dest in range(index_src+1, len(nodes)):
             src = nodes[index_src]
             dest = nodes[index_dest]
-            if type == "GEO":
-                graph.add_edge(src, dest, graph.geo_distance(src,dest))
+            if "GEO" in type:
+                graph.add_edge(src, dest, graph.geo_distance(src, dest))
             else:
-                graph.add_edge(src, dest, graph.euclide_distance(src,dest))
+                graph.add_edge(src, dest, graph.euclide_distance(src, dest))
     file.close()
     return graph
 
+def errore(soluzione, ottimo):
+    return str((soluzione-ottimo)/ottimo)
 
 def main(folder):
+    ottimi_file = open(folder+"/"+"ottimi.txt", "r")
+    ottimi = {}
+    for line in ottimi_file:
+        graph, ottimo = list(line.split(":"))
+        ottimi[graph] = int(ottimo)
+    ottimi_file.close()
     with os.scandir(folder) as it:
-        for i,entry in enumerate(it):
-            if "ulysses16" in entry.name:
+        for i, entry in enumerate(it):
+            if ".tsp" in entry.name:
+                ottimo = ottimi[entry.name]
                 graph = read_file(folder+"/"+entry.name)
-                #start = time.time()
+                start = time.time()
                 preordered = approx_t_tsp(graph, 0)
                 weight = 0
                 for node in preordered:
-                    print(str(node.key()))
-                    weight += node.key()
-                print(weight)
-                break
-                """time_exec = time.time() - start
-                test = entry.name.replace("input_random","output_random")
-                with open(folder+"/"+test) as f:
-                    result = int(f.read().split()[0])
-                    if weight != result:
-                        print("Our result: "+str(weight))
-                        print("Correct: "+str(result))
-                        print("Graph: "+str(entry.name))
-                    else:
-                        result_time = open(folder+"/"+test+"_time", "a")
-                        result_time.write("\nPrim: "+str(time_exec))
-                        result_time.close()"""
+                    weight += 2 * node.key()
+                time_exec = time.time() - start
+                test = entry.name.replace(".tsp", ".out")
+                result = open(folder+"/"+test, "a")
+                result.write("\n2attsp - soluzione: " +
+                             str(weight)+" tempo: "+str(time_exec) + " errore: "+errore(weight, ottimo)+" %")
+                result.close()
+
 
 if __name__ == "__main__":
+    sys.setrecursionlimit(999999999)
     main("tsp_dataset")
 
-#%%
+# %%

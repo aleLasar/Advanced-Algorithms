@@ -1,0 +1,170 @@
+\chapter{Introduzione\label{sec:introduzione}}
+\noindent La relazione descrive gli algoritmi implementati da Alessio Lazzaron e Matteo Marchiori per il secondo laboratorio del corso di algoritmi avanzati.
+
+\section{Descrizione degli algoritmi\label{sec:descrizione}}
+Gli algoritmi implementati sono:
+\begin{itemize}
+    \item Held Karp;
+    \item Algoritmo 2-approssimato, con MST costruito usando l'algoritmo di Prim;
+    \item Euristica costruttiva Cheapest Insertion.
+\end{itemize}
+
+In seguito riportiamo lo pseudocodice degli algoritmi, e la parte saliente del codice implementato in Python in modo da confrontarli facilmente.
+
+\subsection{Algoritmo di Held Karp\label{sec:hp}}
+\begin{verbatim}
+    Held-Karp(G=(V,E), S, v):
+        if(S = {v}) return w[v,0]
+        if(d[v,S] is not NULL) return d[v,S]
+        mindist = inf
+        minprec = NULL
+        for u in S\{v} do:
+            dist = Held-Karp(u, S\{v})
+            if dist + w[u,v] < mindist:
+                mindist = dist + w[u,v]
+                minprec = u
+        d[s,V] = mindist
+        p[s,V] = minprec
+        return mindist        
+\end{verbatim}
+
+\clearpage
+
+\begin{minted}{python}
+    def held_karp(start, v, S: list, d_dict, p_dict):
+        global stop
+        if len(S) == 1 and v in S:
+            return v.find_edge(start).weight()
+        elif (str(v.name()+1), str(S)) in d_dict:
+            return d_dict[(str(v.name()+1), str(S))]
+        else:
+            mindist = float("Inf")
+            minprec = None
+            S2 = list(S)
+            S2.remove(v)
+            for i in range(len(S2)):
+                dist = held_karp(start, S2[i], S2, d_dict, p_dict)
+                uv_weight = S2[i].find_edge(v).weight()
+                if(dist + uv_weight < mindist):
+                    mindist = dist + uv_weight
+                    minprec = S2[i]
+                if stop:
+                    break
+            d_dict[(str(v.name()+1), str(S))] = mindist
+            p_dict[(str(v.name()+1), str(S))] = minprec
+            return mindist
+\end{minted}
+
+Per tenere memoria delle distanze minime e dei nodi predecessori abbiamo utilizzato dizionari di python, in modo da mantenere l'indicizzazione attraverso (nodo destinazione , lista dei nodi coperti) vista a lezione.
+Dato che l'algoritmo ha una complessità O(\(2^{n}\)) è stata inserito un meccanismo per fermare il calcolo dopo un numero di secondi specificabile.
+
+\clearpage
+
+\subsection{Algoritmo 2-approssimato\label{sec:a2a}}
+\begin{verbatim}
+    Preorder(v):
+        print(v)
+        if(internal(v)):
+            foreach u in children(v) do:
+                preorder(u)
+
+    Approx_t_tsp(G=(V,E), c):
+        V = {v1...vn}
+        root = v1
+        T = Prim(G,c,root)
+        <v1...vn> = Preorder(root)
+        return <v1...vn, v1>            
+\end{verbatim}
+
+\begin{minted}{python}
+    def preorder(preordered, v):
+        preordered.append(v)
+        for child in v.children():
+            preorder(preordered, child)
+
+
+    def approx_t_tsp(graph, s):
+        prim(graph, s)
+        nodes = graph.get_graph()
+        preordered = []
+        preorder(preordered, nodes[s])
+        preordered.append(nodes[s])
+        return preordered
+\end{minted}
+
+In questo algoritmo costruiamo una lista dei nodi di un MST trovato usando Prim in ordine prefisso, aggiungendo al termine della lista il nodo radice.
+Funziona perché vale la disuguaglianza triangolare, ovvero per arrivare da un nodo sorgente a un nodo destinazione la soluzione migliore include l'arco che li collega direttamente.
+Osservando la soluzione peggiore di TSP trovata con l'algoritmo, si vede che non può essere peggiore rispetto a prendere due volte il costo della soluzione ottima.
+Quindi l'algoritmo di 2-approssimazione è corretto.
+
+\clearpage
+
+\subsection{Algoritmo Cheapest Insertion\label{sec:ci}}
+\begin{verbatim}
+    Cheapest_insertion(G=(V,E)):
+        sol = (0,j,0)
+        do:
+            (k,i)+(k,j)-(i,j) minimize cost
+            sol = sol + (k,i) + (k,j) - (i,j)
+        while(exists k outside sol)    
+
+\end{verbatim}
+
+\begin{minted}{python}
+    def cheapest_insertion(G:Graph):
+    edges = G.edges()
+    nodes = list(G.nodes())
+    edges_sol = {}
+    weight_sol = 0
+    zero_n = nodes.pop(0)
+    
+    while len(nodes) != 0:
+        local_min = float("inf")
+        local_edge = [None]*3
+        local_node = None
+        if len(edges_sol) == 0:
+            for i in range(len(nodes)):
+                val = edges[zero_n.name(), nodes[i].name()]
+                if val.weight() < local_min:
+                    local_min = val.weight()
+                    local_node = nodes[i]
+                    local_edge[0] = val
+        else:
+            for k in range(len(nodes)):
+                for idx, val in enumerate(edges_sol.values()):
+                    ik = edges[nodes[k].name(), val.nodes()[0].name()]
+                    jk = edges[nodes[k].name(), val.nodes()[1].name()]
+                    ij = val
+
+                    to_minimized = ik.weight() + jk.weight() - ij.weight()
+                    if to_minimized < local_min:
+                        local_min = to_minimized
+                        local_node = nodes[k]
+                        local_edge = ik, jk, val
+
+        nodes.remove(local_node)
+        if not local_edge[1]:
+            weight_sol += local_min*2
+            nodes_e = local_edge[0].nodes()
+            edges_sol[nodes_e[0].name(), nodes_e[1].name()] = local_edge[0]
+            edges_sol[nodes_e[1].name(), nodes_e[0].name()] =\
+                Edge(nodes_e[1], nodes_e[0], local_edge[0].weight())
+                
+
+        else:
+            weight_sol += local_edge[0].weight() + local_edge[1].weight()\
+                - local_edge[2].weight()
+            nodes_0 = local_edge[0].nodes()
+            nodes_1 = local_edge[1].nodes()
+            nodes_2 = local_edge[2].nodes()
+            edges_sol[nodes_0[0].name(), nodes_0[1].name()] = local_edge[0]
+            edges_sol[nodes_1[0].name(), nodes_1[1].name()] = local_edge[1]
+            del edges_sol[nodes_2[0].name(), nodes_2[1].name()]
+
+    return weight_sol
+\end{minted}
+Questo algoritmo di euristica costruttiva parte da un nodo radice e sceglie l'arco incidente su questo nodo che sia di costo minimo. 
+Dopodiché per ogni nodo k, non presente nella soluzione del cammino minimo, vengono scelti due archi: ik e jk, tali che i nodi i, j appartengono alla solucione e tali archi minimizzano la somma tra i lori pesi e la differenza tra il peso dell'arco ij.
+
+\subsection{Scelte implementative comuni\label{sec:comuni}}
+Per tutti gli algoritmi implementati abbiamo cercato di usare, per quanto possibile, la definizione di oggetti e la definizione di metodi previsti da python, in modo da mantenere per quanto possibile il codice comprensibile.

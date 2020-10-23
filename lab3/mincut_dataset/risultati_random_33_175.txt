@@ -1,0 +1,1 @@
+time_fc:0.740706840260834 time_discovery:66.79247236251831 time_karger:9177.237125396729 errore_perc:0.0
